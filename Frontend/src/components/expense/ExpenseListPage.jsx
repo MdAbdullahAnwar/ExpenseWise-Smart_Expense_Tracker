@@ -3,26 +3,43 @@ import axios from "axios";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { useNavigate } from "react-router-dom";
+import Toast from "../ui/toast";
 
-export default function ExpenseListPage({ userId }) {
+export default function ExpenseListPage() {
   const [expenses, setExpenses] = useState([]);
+  const [toast, setToast] = useState(null);
   const navigate = useNavigate();
+
+  const token = localStorage.getItem("token");
 
   const fetchExpenses = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/expense/${userId}`);
+      const res = await axios.get("http://localhost:5000/expense", {
+        headers: { Authorization: `Bearer ${token}` }, // <-- Include token
+      });
       setExpenses(res.data);
     } catch (err) {
-      console.error("Error fetching expenses:", err);
+      console.error(err);
+      setToast({
+        message: err.response?.data?.message || "Failed to fetch expenses",
+        type: "error",
+      });
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/expense/${id}`);
-      fetchExpenses();
+      await axios.delete(`http://localhost:5000/expense/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }, // <-- Include token
+      });
+      setExpenses(expenses.filter((exp) => exp.id !== id));
+      setToast({ message: "Expense deleted!", type: "success" });
     } catch (err) {
-      console.error("Error deleting expense:", err);
+      console.error(err);
+      setToast({
+        message: err.response?.data?.message || "Failed to delete expense",
+        type: "error",
+      });
     }
   };
 
@@ -81,6 +98,14 @@ export default function ExpenseListPage({ userId }) {
           </p>
         )}
       </Card>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

@@ -7,16 +7,14 @@ import { Card } from "../ui/card";
 import { useNavigate } from "react-router-dom";
 import Toast from "../ui/toast";
 
-export default function ExpensePage({ userId }) {
+export default function ExpensePage() {
   const [form, setForm] = useState({
     amount: "",
     description: "",
     category: "",
     customCategory: "",
   });
-  const [expenses, setExpenses] = useState([]);
   const [toast, setToast] = useState(null);
-
   const navigate = useNavigate();
 
   const categories = [
@@ -32,17 +30,10 @@ export default function ExpensePage({ userId }) {
     "Other",
   ];
 
+  const token = localStorage.getItem("token");
+
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-
-  const fetchExpenses = async () => {
-    try {
-      const res = await axios.get(`http://localhost:5000/expense/${userId}`);
-      setExpenses(res.data);
-    } catch (err) {
-      console.error("Error fetching expenses:", err);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,19 +49,29 @@ export default function ExpensePage({ userId }) {
     }
 
     try {
-      await axios.post("http://localhost:5000/expense/add", {
-        ...form,
-        category: finalCategory,
-        userId,
+      await axios.post(
+        "http://localhost:5000/expense/add",
+        {
+          amount: form.amount,
+          description: form.description,
+          category: finalCategory,
+        },
+        { headers: { Authorization: `Bearer ${token}` } } // <-- Include token
+      );
+
+      setForm({
+        amount: "",
+        description: "",
+        category: "",
+        customCategory: "",
       });
-
-      setForm({ amount: "", description: "", category: "", customCategory: "" });
-      fetchExpenses();
-
       setToast({ message: "Expense added successfully!", type: "success" });
     } catch (err) {
-      console.error("Error adding expense:", err);
-      setToast({ message: "Failed to add expense.", type: "error" });
+      console.error(err);
+      setToast({
+        message: err.response?.data?.message || "Failed to add expense.",
+        type: "error",
+      });
     }
   };
 
@@ -151,7 +152,6 @@ export default function ExpensePage({ userId }) {
         </form>
       </Card>
 
-      {/* Toast */}
       {toast && (
         <Toast
           message={toast.message}

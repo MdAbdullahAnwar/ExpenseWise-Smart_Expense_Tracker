@@ -29,18 +29,15 @@ export default function LoginForm({ setUserId }) {
         headers: { "Content-Type": "application/json" },
       });
 
-      const userId = res.data.userId; // assuming backend sends it
-
-      // ✅ Save to localStorage and state
-      localStorage.setItem("userId", userId);
-      setUserId(userId);
+      // Save JWT token
+      const token = res.data.token;
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", res.data.userId); // optional
+      setUserId(res.data.userId);
 
       setToast({ message: "Login successful!", type: "success" });
 
-      // ✅ Redirect to expense page after a short delay (so toast is visible)
-      setTimeout(() => {
-        navigate("/expenses");
-      }, 800);
+      setTimeout(() => navigate("/expenses"), 800);
     } catch (err) {
       const errorMessage =
         err.response?.data?.message || "Login failed. Please try again.";
