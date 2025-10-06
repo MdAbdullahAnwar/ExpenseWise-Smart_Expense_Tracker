@@ -1,4 +1,3 @@
-// src/utils/validateForm.js
 export function validateForm({ name, email, password }) {
   if (!name || !email || !password) {
     return { valid: false, message: "All fields are required" };
