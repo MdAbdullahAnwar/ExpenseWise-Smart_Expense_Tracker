@@ -5,11 +5,12 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Card } from "../ui/card";
 import Toast from "../ui/toast";
-import { validateForm } from "../../utils/validateForm";
+import { useNavigate } from "react-router-dom";
 
-export default function LoginForm() {
+export default function LoginForm({ setUserId }) {
   const [form, setForm] = useState({ email: "", password: "" });
   const [toast, setToast] = useState(null);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -28,10 +29,18 @@ export default function LoginForm() {
         headers: { "Content-Type": "application/json" },
       });
 
-      setToast({ message: "Login successful!", type: "success" });
-      setForm({ email: "", password: "" });
+      const userId = res.data.userId; // assuming backend sends it
 
-      // window.location.href = "/dashboard";
+      // ✅ Save to localStorage and state
+      localStorage.setItem("userId", userId);
+      setUserId(userId);
+
+      setToast({ message: "Login successful!", type: "success" });
+
+      // ✅ Redirect to expense page after a short delay (so toast is visible)
+      setTimeout(() => {
+        navigate("/expenses");
+      }, 800);
     } catch (err) {
       const errorMessage =
         err.response?.data?.message || "Login failed. Please try again.";

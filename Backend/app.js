@@ -6,11 +6,15 @@ const sequelize = require("./config/database");
 const User = require("./models/user");  
 
 const authRoutes = require("./routes/authRoutes");
+const expenseRoutes = require("./routes/expenseRoutes");
+
 const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use("/user", authRoutes);
+
+app.use("/expense", expenseRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");
