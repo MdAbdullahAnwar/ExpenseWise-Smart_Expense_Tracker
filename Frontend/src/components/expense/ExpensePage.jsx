@@ -56,7 +56,7 @@ export default function ExpensePage() {
           description: form.description,
           category: finalCategory,
         },
-        { headers: { Authorization: `Bearer ${token}` } } // <-- Include token
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setForm({

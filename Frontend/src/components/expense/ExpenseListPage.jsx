@@ -15,7 +15,7 @@ export default function ExpenseListPage() {
   const fetchExpenses = async () => {
     try {
       const res = await axios.get("http://localhost:5000/expense", {
-        headers: { Authorization: `Bearer ${token}` }, // <-- Include token
+        headers: { Authorization: `Bearer ${token}` },
       });
       setExpenses(res.data);
     } catch (err) {
@@ -30,7 +30,7 @@ export default function ExpenseListPage() {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/expense/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }, // <-- Include token
+        headers: { Authorization: `Bearer ${token}` },
       });
       setExpenses(expenses.filter((exp) => exp.id !== id));
       setToast({ message: "Expense deleted!", type: "success" });
