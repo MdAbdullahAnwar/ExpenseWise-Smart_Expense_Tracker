@@ -1,12 +1,14 @@
 const express = require("express");
-// const bodyParser = require("body-parser");
 const cors = require("cors");
 const sequelize = require("./config/database");
 
-const User = require("./models/user");  
+const User = require("./models/user");
+const Expense = require("./models/expense");
+const Order = require("./models/order"); // Add this
 
 const authRoutes = require("./routes/authRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
+const paymentRoutes = require("./routes/paymentRoutes"); // Add this
 
 const app = express();
 
@@ -15,15 +17,16 @@ app.use(express.json());
 
 app.use("/user", authRoutes);
 app.use("/expense", expenseRoutes);
+app.use("/payment", paymentRoutes); // Add this
 
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// Sync DB
+// Sync DB (creates tables)
 sequelize
-  .sync()
+  .sync({ alter: true })
   .then(() => console.log("Database synced"))
-.catch((err) => console.error("Database sync error:", err));
+  .catch((err) => console.error("Database sync error:", err));
 
 module.exports = app;

@@ -34,7 +34,6 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
   });
 
   useEffect(() => {
-    // Update form data when userInfo changes
     if (userInfo) {
       setFormData({
         name: userInfo.name || "",
@@ -72,7 +71,6 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
         }
       );
 
-      // Update local storage and parent state
       const updatedUserInfo = { ...userInfo, ...formData };
       localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
       
@@ -94,7 +92,6 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
   };
 
   const handleCancel = () => {
-    // Reset form data to original values
     setFormData({
       name: userInfo?.name || "",
       email: userInfo?.email || "",
@@ -108,7 +105,6 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
   return (
     <div className="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        {/* Profile Header */}
         <Card className="p-6 md:p-8 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl mb-8">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="relative">
@@ -179,7 +175,6 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
         </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Personal Information */}
           <div className="lg:col-span-2">
             <Card className="p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
@@ -257,7 +252,6 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
               </form>
             </Card>
 
-            {/* Quick Actions */}
             <Card className="p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl mt-8">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                 <Settings className="w-5 h-5" />
@@ -285,7 +279,6 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
             </Card>
           </div>
 
-          {/* Stats & Activity */}
           <div>
             <Card className="p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
@@ -329,7 +322,6 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
         </div>
       </div>
 
-      {/* Toast Notification */}
       {toast && (
         <Toast
           message={toast.message}

@@ -23,7 +23,6 @@ function App() {
 
   useEffect(() => {
     if (userId && !userInfo) {
-      // Fetch user info if needed
       const storedInfo = localStorage.getItem("userInfo");
       if (storedInfo) {
         setUserInfo(JSON.parse(storedInfo));
@@ -42,13 +41,13 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public routes */}
         <Route
           path="/"
           element={
             <Layout
               isAuthenticated={!!userId}
               userInfo={userInfo}
+              setUserInfo={setUserInfo} // Add this
               onLogout={handleLogout}
             />
           }
@@ -62,7 +61,6 @@ function App() {
             }
           />
 
-          {/* Protected routes */}
           <Route
             path="dashboard"
             element={
@@ -105,7 +103,13 @@ function App() {
           />
           <Route
             path="premium"
-            element={userId ? <PremiumPage /> : <Navigate to="/login" />}
+            element={
+              userId ? (
+                <PremiumPage userInfo={userInfo} setUserInfo={setUserInfo} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
           />
         </Route>
 

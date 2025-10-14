@@ -20,7 +20,6 @@ import {
   DollarSign
 } from "lucide-react";
 
-// Hero Badge Component
 const HeroBadge = () => (
   <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-8 border border-blue-200 dark:border-blue-800">
     <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -31,7 +30,6 @@ const HeroBadge = () => (
   </div>
 );
 
-// Hero Title Component
 const HeroTitle = () => (
   <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-8">
     <span className="block text-gray-900 dark:text-white mb-2">
@@ -43,7 +41,6 @@ const HeroTitle = () => (
   </h1>
 );
 
-// Hero Subtitle Component
 const HeroSubtitle = () => (
   <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto">
     Track expenses, set budgets, and achieve your financial goals with ExpenseWise - 
@@ -51,7 +48,6 @@ const HeroSubtitle = () => (
   </p>
 );
 
-// CTA Buttons Component
 const CTAButtons = () => (
   <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
     <button className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 px-8 py-4 rounded-lg font-semibold text-base flex items-center justify-center group">
@@ -64,7 +60,6 @@ const CTAButtons = () => (
   </div>
 );
 
-// Trust Badges Component
 const TrustBadges = () => (
   <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm text-gray-600 dark:text-gray-400">
     <div className="flex items-center gap-2">
@@ -82,7 +77,6 @@ const TrustBadges = () => (
   </div>
 );
 
-// Dashboard Card Component
 const DashboardCard = ({ icon: Icon, value, label, color, progress }) => (
   <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
     <div className="flex items-center justify-between mb-3">
@@ -98,7 +92,6 @@ const DashboardCard = ({ icon: Icon, value, label, color, progress }) => (
   </div>
 );
 
-// Dashboard Preview Component
 const DashboardPreview = () => (
   <div className="mt-20 relative">
     <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent dark:from-gray-900 z-10 pointer-events-none h-32 bottom-0 top-auto" />
@@ -132,7 +125,6 @@ const DashboardPreview = () => (
   </div>
 );
 
-// Stat Card Component
 const StatCard = ({ icon: Icon, value, label }) => (
   <div className="text-center group">
     <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl mb-3 group-hover:scale-110 transition-transform">
@@ -147,7 +139,6 @@ const StatCard = ({ icon: Icon, value, label }) => (
   </div>
 );
 
-// Feature Card Component
 const FeatureCard = ({ icon: Icon, title, description, color }) => (
   <div className="group p-6 bg-white dark:bg-gray-700 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 dark:border-gray-600 cursor-pointer">
     <div className={`w-14 h-14 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg`}>
@@ -162,7 +153,6 @@ const FeatureCard = ({ icon: Icon, title, description, color }) => (
   </div>
 );
 
-// Testimonial Card Component
 const TestimonialCard = ({ testimonial, isActive }) => (
   <div className={`bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border cursor-pointer ${
     isActive 
@@ -193,7 +183,6 @@ const TestimonialCard = ({ testimonial, isActive }) => (
   </div>
 );
 
-// Pricing Card Component
 const PricingCard = ({ plan }) => (
   <div className={`relative p-8 rounded-2xl transition-all duration-300 hover:scale-105 cursor-pointer ${
     plan.highlighted
@@ -255,7 +244,6 @@ const PricingCard = ({ plan }) => (
   </div>
 );
 
-// Main Landing Page Component
 export default function LandingPage() {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
@@ -387,7 +375,6 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Hero Section - Gradient Blue/Purple */}
       <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(59,130,246,0.1),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(168,85,247,0.1),transparent_50%)]" />
@@ -404,7 +391,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Stats Section - Light Gray with Gradient Border */}
       <section className="relative py-16 bg-gradient-to-b from-gray-100 to-white dark:from-gray-800 dark:to-gray-850">
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -417,7 +403,6 @@ export default function LandingPage() {
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50"></div>
       </section>
 
-      {/* Features Section - Dark Slate */}
       <section className="py-20 bg-slate-900 dark:bg-gray-950 relative overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
@@ -444,7 +429,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials Section - Purple Gradient */}
       <section className="py-20 bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 dark:from-purple-950 dark:via-gray-900 dark:to-blue-950 relative">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(168,85,247,0.1),transparent_70%)]" />
         
@@ -485,7 +469,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Section - White/Light with Accent */}
       <section className="py-20 bg-gradient-to-b from-white via-blue-50/30 to-white dark:from-gray-900 dark:via-blue-950/20 dark:to-gray-900 relative">
         <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-purple-100/50 to-transparent dark:from-purple-950/30 dark:to-transparent"></div>
         
@@ -507,7 +490,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section - Bold Gradient */}
       <section className="py-20 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-700 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.08),transparent_50%)]" />

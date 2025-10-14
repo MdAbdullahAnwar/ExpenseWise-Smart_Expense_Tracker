@@ -12,11 +12,9 @@ export const useTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    // Check if window is defined (for SSR safety)
     if (typeof window !== 'undefined') {
       try {
         const savedTheme = localStorage.getItem('theme');
-        // Check system preference if no saved theme
         if (!savedTheme) {
           const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           return prefersDark ? 'dark' : 'light';
@@ -34,16 +32,12 @@ export const ThemeProvider = ({ children }) => {
     try {
       const root = document.documentElement;
       
-      // Remove both classes first to avoid conflicts
       root.classList.remove('light', 'dark');
       
-      // Add the current theme class
       root.classList.add(theme);
       
-      // Save to localStorage
       localStorage.setItem('theme', theme);
       
-      // Also set data attribute for additional styling options
       root.setAttribute('data-theme', theme);
     } catch (error) {
       console.error('Error applying theme:', error);

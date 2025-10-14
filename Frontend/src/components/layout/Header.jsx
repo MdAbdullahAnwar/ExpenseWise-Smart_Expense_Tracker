@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/button";
 
-export default function Header({ isAuthenticated, userInfo, onLogout }) {
+export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
@@ -31,8 +31,7 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
     onLogout();
     navigate("/");
   };
-
-  // Close dropdown when clicking outside
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -49,7 +48,6 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
     };
   }, [profileDropdownOpen]);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
     setProfileDropdownOpen(false);
@@ -67,7 +65,6 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-200">
               <Wallet className="w-6 h-6 text-white" />
@@ -82,7 +79,6 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
           {isAuthenticated ? (
             <nav className="hidden md:flex items-center space-x-1">
               {navItems.map((item) => {
@@ -103,10 +99,9 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
                 );
               })}
 
-              {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-200"
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-200 cursor-pointer"
                 aria-label="Toggle theme"
               >
                 {theme === "light" ? (
@@ -116,19 +111,27 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
                 )}
               </button>
 
-              {/* Premium Button - Fixed alignment */}
-              <Link to="/premium" className="ml-2">
-                <Button className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200">
-                  <Crown className="w-4 h-4" />
-                  <span>Go Premium</span>
-                </Button>
-              </Link>
+              {/* Premium Button - shows status */}
+              {userInfo?.isPremium ? (
+                <Link to="/premium" className="ml-2 cursor-pointer">
+                  <Button className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg cursor-pointer">
+                    <Crown className="w-4 h-4" />
+                    <span>Premium Member</span>
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/premium" className="ml-2 cursor-pointer">
+                  <Button className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 cursor-pointer">
+                    <Crown className="w-4 h-4" />
+                    <span>Go Premium</span>
+                  </Button>
+                </Link>
+              )}
 
-              {/* Profile Dropdown */}
               <div ref={dropdownRef} className="relative ml-4 pl-4 border-l border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+                  className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer"
                 >
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
                     {userInfo?.name?.charAt(0).toUpperCase() || "U"}
@@ -139,13 +142,12 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
                   <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Dropdown Menu */}
                 {profileDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
                     <Link
                       to="/profile"
                       onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                     >
                       <User className="w-4 h-4" />
                       View Profile
@@ -153,7 +155,7 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
                     <hr className="my-2 border-gray-200 dark:border-gray-700" />
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 w-full text-left transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 w-full text-left transition-colors cursor-pointer"
                     >
                       <LogOut className="w-4 h-4" />
                       Logout
@@ -166,7 +168,7 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
             <nav className="hidden md:flex items-center space-x-4">
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-200"
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-200 cursor-pointer"
                 aria-label="Toggle theme"
               >
                 {theme === "light" ? (
@@ -176,22 +178,21 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
                 )}
               </button>
               <Link to="/login">
-                <Button variant="outline" className="border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 transition-all">
+                <Button variant="outline" className="border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 transition-all cursor-pointer">
                   Login
                 </Button>
               </Link>
               <Link to="/signup">
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer">
                   Sign Up
                 </Button>
               </Link>
             </nav>
           )}
 
-          {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            className="md:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer"
             aria-label="Toggle mobile menu"
           >
             {mobileMenuOpen ? (
@@ -202,7 +203,6 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
           </button>
         </div>
 
-        {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700 animate-in slide-in-from-top duration-200">
             {isAuthenticated ? (
@@ -214,7 +214,7 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
                       key={item.path}
                       to={item.path}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${
                         isActive(item.path)
                           ? "bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 text-blue-600 dark:text-blue-400"
                           : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -226,10 +226,9 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
                   );
                 })}
                 
-                {/* Theme Toggle Mobile */}
                 <button
                   onClick={toggleTheme}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left transition-colors cursor-pointer"
                 >
                   {theme === "light" ? (
                     <>
@@ -244,21 +243,31 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
                   )}
                 </button>
 
-                {/* Premium Button Mobile - Fixed alignment */}
-                <Link
-                  to="/premium"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
-                >
-                  <Crown className="w-5 h-5" />
-                  <span>Go Premium</span>
-                </Link>
+                {/* Mobile Premium Button - shows status */}
+                {userInfo?.isPremium ? (
+                  <Link
+                    to="/premium"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors cursor-pointer"
+                  >
+                    <Crown className="w-5 h-5" />
+                    <span>Premium Member</span>
+                  </Link>
+                ) : (
+                  <Link
+                    to="/premium"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors cursor-pointer"
+                  >
+                    <Crown className="w-5 h-5" />
+                    <span>Go Premium</span>
+                  </Link>
+                )}
                 
-                {/* User Profile Link in Mobile */}
                 <Link
                   to="/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 dark:text-gray-300 border-t border-gray-200 dark:border-gray-700 mt-2 pt-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 dark:text-gray-300 border-t border-gray-200 dark:border-gray-700 mt-2 pt-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                 >
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
                     {userInfo?.name?.charAt(0).toUpperCase() || "U"}
@@ -271,7 +280,7 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
                 
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 w-full text-left transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 w-full text-left transition-colors cursor-pointer"
                 >
                   <LogOut className="w-5 h-5" />
                   <span className="text-sm">Logout</span>
@@ -281,7 +290,7 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
               <div className="space-y-2">
                 <button
                   onClick={toggleTheme}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left transition-colors cursor-pointer"
                 >
                   {theme === "light" ? (
                     <>
@@ -298,14 +307,14 @@ export default function Header({ isAuthenticated, userInfo, onLogout }) {
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-3 text-center bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors font-medium"
+                  className="block px-4 py-3 text-center bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors font-medium cursor-pointer"
                 >
                   Login
                 </Link>
                 <Link
                   to="/signup"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-3 text-center bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all shadow-lg font-medium"
+                  className="block px-4 py-3 text-center bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all shadow-lg font-medium cursor-pointer"
                 >
                   Sign Up
                 </Link>
