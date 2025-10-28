@@ -28,7 +28,8 @@ router.post("/signup", async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
-        isPremium: user.isPremium
+        isPremium: user.isPremium,
+        monthlyBudget: user.monthlyBudget
       }
     });
   } catch (err) {
@@ -60,7 +61,8 @@ router.post("/login", async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
-        isPremium: user.isPremium
+        isPremium: user.isPremium,
+        monthlyBudget: user.monthlyBudget
       }
     });
   } catch (err) {
@@ -70,3 +72,33 @@ router.post("/login", async (req, res) => {
 });
 
 module.exports = router;
+
+// Update Budget
+router.put("/budget", async (req, res) => {
+  const authHeader = req.headers["authorization"];
+  if (!authHeader) return res.status(401).json({ message: "No token provided" });
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { monthlyBudget } = req.body;
+
+    if (monthlyBudget === undefined || monthlyBudget < 0) {
+      return res.status(400).json({ message: "Invalid budget amount" });
+    }
+
+    const user = await User.findByPk(decoded.userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.monthlyBudget = monthlyBudget;
+    await user.save();
+
+    res.status(200).json({ 
+      message: "Budget updated successfully",
+      monthlyBudget: user.monthlyBudget
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});

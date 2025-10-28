@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
+import { useSelector } from "react-redux";
 import {
   Menu,
   X,
@@ -14,6 +15,7 @@ import {
   LogOut,
   Wallet,
   ChevronDown,
+  BarChart3,
 } from "lucide-react";
 import { Button } from "../ui/button";
 
@@ -24,6 +26,7 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
   const location = useLocation();
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+  const isPremium = useSelector((state) => state.user.isPremium);
 
   const handleLogout = () => {
     setProfileDropdownOpen(false);
@@ -57,6 +60,7 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
     { path: "/", label: "Home", icon: Home },
     { path: "/expenses", label: "Add Expense", icon: PlusCircle },
     { path: "/expense-list", label: "Expense List", icon: List },
+    ...(isPremium ? [{ path: "/analyse", label: "Analyse Expenses", icon: BarChart3 }] : []),
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -80,7 +84,7 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
           </Link>
 
           {isAuthenticated ? (
-            <nav className="hidden md:flex items-center space-x-1">
+            <nav className="hidden lg:flex items-center space-x-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -99,17 +103,19 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
                 );
               })}
 
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-200 cursor-pointer"
-                aria-label="Toggle theme"
-              >
-                {theme === "light" ? (
-                  <Moon className="w-4 h-4" />
-                ) : (
-                  <Sun className="w-4 h-4" />
-                )}
-              </button>
+              {isPremium && (
+                <button
+                  onClick={toggleTheme}
+                  className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-200 cursor-pointer"
+                  aria-label="Toggle theme"
+                >
+                  {theme === "light" ? (
+                    <Moon className="w-4 h-4" />
+                  ) : (
+                    <Sun className="w-4 h-4" />
+                  )}
+                </button>
+              )}
 
               {/* Premium Button - shows status */}
               {userInfo?.isPremium ? (
@@ -166,17 +172,6 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
             </nav>
           ) : (
             <nav className="hidden md:flex items-center space-x-4">
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-200 cursor-pointer"
-                aria-label="Toggle theme"
-              >
-                {theme === "light" ? (
-                  <Moon className="w-4 h-4" />
-                ) : (
-                  <Sun className="w-4 h-4" />
-                )}
-              </button>
               <Link to="/login">
                 <Button variant="outline" className="border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 transition-all cursor-pointer">
                   Login
@@ -192,7 +187,7 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer"
+            className="lg:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer"
             aria-label="Toggle mobile menu"
           >
             {mobileMenuOpen ? (
@@ -204,7 +199,7 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700 animate-in slide-in-from-top duration-200">
+          <div className="lg:hidden py-4 border-t border-gray-200 dark:border-gray-700 animate-in slide-in-from-top duration-200">
             {isAuthenticated ? (
               <div className="space-y-2">
                 {navItems.map((item) => {
@@ -226,22 +221,24 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
                   );
                 })}
                 
-                <button
-                  onClick={toggleTheme}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left transition-colors cursor-pointer"
-                >
-                  {theme === "light" ? (
-                    <>
-                      <Moon className="w-5 h-5" />
-                      <span>Dark Mode</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sun className="w-5 h-5" />
-                      <span>Light Mode</span>
-                    </>
-                  )}
-                </button>
+                {isPremium && (
+                  <button
+                    onClick={toggleTheme}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left transition-colors cursor-pointer"
+                  >
+                    {theme === "light" ? (
+                      <>
+                        <Moon className="w-5 h-5" />
+                        <span>Dark Mode</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sun className="w-5 h-5" />
+                        <span>Light Mode</span>
+                      </>
+                    )}
+                  </button>
+                )}
 
                 {/* Mobile Premium Button - shows status */}
                 {userInfo?.isPremium ? (
@@ -288,22 +285,6 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
               </div>
             ) : (
               <div className="space-y-2">
-                <button
-                  onClick={toggleTheme}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left transition-colors cursor-pointer"
-                >
-                  {theme === "light" ? (
-                    <>
-                      <Moon className="w-5 h-5" />
-                      <span>Dark Mode</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sun className="w-5 h-5" />
-                      <span>Light Mode</span>
-                    </>
-                  )}
-                </button>
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}

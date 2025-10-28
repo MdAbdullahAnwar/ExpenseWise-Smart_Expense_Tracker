@@ -19,6 +19,11 @@ const User = sequelize.define("User", {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  monthlyBudget: {
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0,
+    allowNull: false,
+  },
 });
 
 module.exports = User;

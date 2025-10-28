@@ -4,14 +4,14 @@ import Footer from "./Footer";
 
 export default function Layout({ isAuthenticated, userInfo, setUserInfo, onLogout }) {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-200">
       <Header 
         isAuthenticated={isAuthenticated} 
         userInfo={userInfo} 
         setUserInfo={setUserInfo}
         onLogout={onLogout} 
       />
-      <main className="flex-grow">
+      <main className="flex-1 bg-background">
         <Outlet />
       </main>
       <Footer />

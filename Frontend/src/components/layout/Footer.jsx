@@ -12,7 +12,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
+    <footer className="bg-card border-t border-border mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
@@ -24,45 +24,45 @@ export default function Footer() {
                 ExpenseWise
               </span>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
+            <p className="text-muted-foreground text-sm">
               Track your expenses smartly and efficiently. Take control of your financial future with our intuitive expense tracking platform.
             </p>
             <div className="flex space-x-4 mt-6">
-              <a href="#" className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
                 <Github className="w-5 h-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
                 <Linkedin className="w-5 h-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
                 <Mail className="w-5 h-5" />
               </a>
             </div>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Quick Links</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/about" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/features" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/features" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   Features
                 </Link>
               </li>
               <li>
-                <Link to="/pricing" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/pricing" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   Contact
                 </Link>
               </li>
@@ -70,25 +70,25 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Support</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-4">Support</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/help" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/help" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   Help Center
                 </Link>
               </li>
               <li>
-                <Link to="/privacy" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link to="/terms" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link to="/faq" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/faq" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   FAQ
                 </Link>
               </li>
@@ -96,12 +96,12 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+        <div className="mt-8 pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-muted-foreground">
               © {currentYear} ExpenseWise. All rights reserved.
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1 mt-2 md:mt-0">
+            <p className="text-sm text-muted-foreground flex items-center gap-1 mt-2 md:mt-0">
               Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> by Your Team
             </p>
           </div>

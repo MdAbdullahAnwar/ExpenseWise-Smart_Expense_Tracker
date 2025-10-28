@@ -103,9 +103,15 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
   };
 
   return (
-    <div className="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        <Card className="p-6 md:p-8 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl mb-8">
+    <div className="bg-background p-4 md:p-8 pb-12">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-purple-400/10 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div className="relative max-w-6xl mx-auto animate-fade-in mb-8">
+        <Card className="bg-card border-border p-6 md:p-8 mb-8">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="relative">
               <div className="w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-xl">
@@ -117,14 +123,14 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
             </div>
             
             <div className="text-center md:text-left flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 {formData.name || "User"}
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 flex items-center justify-center md:justify-start gap-2">
+              <p className="text-muted-foreground flex items-center justify-center md:justify-start gap-2">
                 <Mail className="w-4 h-4" />
                 {formData.email}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-500 mt-2 flex items-center justify-center md:justify-start gap-2">
+              <p className="text-sm text-muted-foreground mt-2 flex items-center justify-center md:justify-start gap-2">
                 <Calendar className="w-4 h-4" />
                 Member since {new Date().toLocaleDateString()}
               </p>
@@ -176,8 +182,8 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <Card className="p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+            <Card className="bg-card border-border p-6">
+              <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
                 <User className="w-5 h-5" />
                 Personal Information
               </h2>
@@ -237,7 +243,7 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
                       value={formData.currency}
                       onChange={handleChange}
                       disabled={!isEditing}
-                      className="w-full mt-1 px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed"
+                      className="w-full mt-1 px-3 py-2 border rounded-lg bg-background border-input disabled:bg-muted disabled:cursor-not-allowed text-foreground"
                     >
                       <option value="USD">USD ($)</option>
                       <option value="EUR">EUR (€)</option>
@@ -252,26 +258,26 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
               </form>
             </Card>
 
-            <Card className="p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl mt-8">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+            <Card className="bg-card border-border p-6 mt-8">
+              <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
                 <Settings className="w-5 h-5" />
                 Quick Actions
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button variant="outline" className="justify-start hover:bg-blue-50 dark:hover:bg-blue-900/20">
+                <Button variant="outline" className="justify-start hover:bg-primary/10">
                   <Download className="w-4 h-4 mr-2" />
                   Export Data
                 </Button>
-                <Button variant="outline" className="justify-start hover:bg-purple-50 dark:hover:bg-purple-900/20">
+                <Button variant="outline" className="justify-start hover:bg-primary/10">
                   <Bell className="w-4 h-4 mr-2" />
                   Notifications
                 </Button>
-                <Button variant="outline" className="justify-start hover:bg-green-50 dark:hover:bg-green-900/20">
+                <Button variant="outline" className="justify-start hover:bg-primary/10">
                   <Shield className="w-4 h-4 mr-2" />
                   Privacy Settings
                 </Button>
-                <Button variant="outline" className="justify-start hover:bg-amber-50 dark:hover:bg-amber-900/20">
+                <Button variant="outline" className="justify-start hover:bg-primary/10">
                   <CreditCard className="w-4 h-4 mr-2" />
                   Billing
                 </Button>
@@ -280,19 +286,19 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
           </div>
 
           <div>
-            <Card className="p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+            <Card className="bg-card border-border p-6">
+              <h2 className="text-xl font-bold text-foreground mb-6">
                 Account Stats
               </h2>
               
               <div className="space-y-4">
-                <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Expenses</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">245</p>
+                <div className="p-4 bg-primary/5 rounded-lg border border-border">
+                  <p className="text-sm text-muted-foreground">Total Expenses</p>
+                  <p className="text-2xl font-bold text-foreground">245</p>
                 </div>
-                <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg border border-purple-200 dark:border-purple-800">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">This Month</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <div className="p-4 bg-primary/5 rounded-lg border border-border">
+                  <p className="text-sm text-muted-foreground">This Month</p>
+                  <p className="text-2xl font-bold text-foreground">
                     {formData.currency === "USD" && "$"}
                     {formData.currency === "EUR" && "€"}
                     {formData.currency === "GBP" && "£"}
@@ -303,9 +309,9 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
                     3,420
                   </p>
                 </div>
-                <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg border border-green-200 dark:border-green-800">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Saved</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <div className="p-4 bg-primary/5 rounded-lg border border-border">
+                  <p className="text-sm text-muted-foreground">Saved</p>
+                  <p className="text-2xl font-bold text-foreground">
                     {formData.currency === "USD" && "$"}
                     {formData.currency === "EUR" && "€"}
                     {formData.currency === "GBP" && "£"}
