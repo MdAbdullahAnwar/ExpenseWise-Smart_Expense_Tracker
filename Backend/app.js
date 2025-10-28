@@ -8,7 +8,8 @@ const Order = require("./models/order"); // Add this
 
 const authRoutes = require("./routes/authRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
-const paymentRoutes = require("./routes/paymentRoutes"); // Add this
+const paymentRoutes = require("./routes/paymentRoutes");
+const leaderboardRoutes = require("./routes/leaderboardRoutes");
 
 const app = express();
 
@@ -17,7 +18,8 @@ app.use(express.json());
 
 app.use("/user", authRoutes);
 app.use("/expense", expenseRoutes);
-app.use("/payment", paymentRoutes); // Add this
+app.use("/payment", paymentRoutes);
+app.use("/leaderboard", leaderboardRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");

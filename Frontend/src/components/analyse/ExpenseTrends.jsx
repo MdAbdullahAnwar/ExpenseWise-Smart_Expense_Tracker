@@ -43,34 +43,34 @@ export default function ExpenseTrends() {
     let processed = [];
 
     if (filterType === "week") {
+      // Last 7 days with day names
       const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-      processed = days.map((day, index) => {
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
         const dayExpenses = data.filter((exp) => {
           const expDate = new Date(exp.createdAt);
-          return expDate.getDay() === index && 
-                 expDate >= new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          return expDate.toDateString() === date.toDateString();
         });
-        return {
-          name: day,
+        processed.push({
+          name: days[date.getDay()],
           amount: dayExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0),
-        };
-      });
-    } else if (filterType === "month") {
-      const weeks = ["Week 1", "Week 2", "Week 3", "Week 4"];
-      processed = weeks.map((week, index) => {
-        const weekExpenses = data.filter((exp) => {
-          const expDate = new Date(exp.createdAt);
-          const weekNum = Math.floor((expDate.getDate() - 1) / 7);
-          return weekNum === index && 
-                 expDate.getMonth() === now.getMonth() &&
-                 expDate.getFullYear() === now.getFullYear();
         });
-        return {
-          name: week,
-          amount: weekExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0),
-        };
-      });
+      }
+    } else if (filterType === "month") {
+      // Last 30 days
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        const dayExpenses = data.filter((exp) => {
+          const expDate = new Date(exp.createdAt);
+          return expDate.toDateString() === date.toDateString();
+        });
+        processed.push({
+          name: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          amount: dayExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0),
+        });
+      }
     } else if (filterType === "year") {
+      // Last 12 months
       const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       processed = months.map((month, index) => {
         const monthExpenses = data.filter((exp) => {
@@ -155,7 +155,7 @@ export default function ExpenseTrends() {
                     <YAxis />
                     <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
                     <Legend />
-                    <Bar dataKey="amount" fill="#3b82f6" name="Expenses ($)" />
+                    <Bar dataKey="amount" fill="#10b981" name="Expenses ($)" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

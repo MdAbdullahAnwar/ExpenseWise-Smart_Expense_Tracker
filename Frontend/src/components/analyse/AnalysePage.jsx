@@ -49,7 +49,7 @@ export default function AnalysePage() {
           </CardHeader>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card 
             className="cursor-pointer hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-card border-border"
             onClick={() => navigate("/analyse/category-breakdown")}
@@ -79,6 +79,25 @@ export default function AnalysePage() {
                 <h3 className="text-2xl font-bold mb-2">Expense Trends</h3>
                 <p className="text-muted-foreground">
                   Analyze spending patterns with weekly, monthly, and yearly charts
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="cursor-pointer hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-card border-border"
+            onClick={() => navigate("/analyse/leaderboard")}
+          >
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl mb-4 shadow-lg">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold mb-2">User Leaderboard</h3>
+                <p className="text-muted-foreground">
+                  See how you rank among premium users and compete for the top spot
                 </p>
               </div>
             </CardContent>

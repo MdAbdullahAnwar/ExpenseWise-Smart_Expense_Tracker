@@ -19,6 +19,7 @@ import PremiumPage from "./components/premium/PremiumPage";
 import AnalysePage from "./components/analyse/AnalysePage";
 import CategoryBreakdown from "./components/analyse/CategoryBreakdown";
 import ExpenseTrends from "./components/analyse/ExpenseTrends";
+import Leaderboard from "./components/analyse/Leaderboard";
 
 function AppContent() {
   const dispatch = useDispatch();
@@ -151,6 +152,16 @@ function AppContent() {
             element={
               userId ? (
                 <ExpenseTrends />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="analyse/leaderboard"
+            element={
+              userId ? (
+                <Leaderboard />
               ) : (
                 <Navigate to="/login" />
               )

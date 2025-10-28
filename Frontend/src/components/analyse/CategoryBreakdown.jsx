@@ -7,7 +7,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { ArrowLeft, Lock } from "lucide-react";
 
-const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#84cc16'];
+const CATEGORY_COLORS = {
+  "Food": "#3b82f6",
+  "Transport": "#8b5cf6",
+  "Shopping": "#ec4899",
+  "Rent": "#10b981",
+  "Bills": "#f59e0b",
+  "Entertainment": "#ef4444",
+  "Health": "#06b6d4",
+  "Education": "#84cc16",
+  "Salary": "#a855f7",
+  "Other": "#64748b",
+};
 
 export default function CategoryBreakdown() {
   const navigate = useNavigate();
@@ -99,7 +110,7 @@ export default function CategoryBreakdown() {
                         dataKey="value"
                       >
                         {categoryData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[entry.name] || "#64748b"} />
                         ))}
                       </Pie>
                       <Tooltip formatter={(value) => `$${value}`} />
@@ -109,10 +120,10 @@ export default function CategoryBreakdown() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {categoryData.map((item, index) => (
+                  {categoryData.map((item) => (
                     <div key={item.name} className="flex items-center justify-between p-4 bg-muted rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[item.name] || "#64748b" }}></div>
                         <span className="font-medium">{item.name}</span>
                       </div>
                       <span className="font-bold text-lg">${item.value}</span>
