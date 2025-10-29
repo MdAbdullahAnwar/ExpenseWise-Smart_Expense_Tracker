@@ -79,7 +79,7 @@ function AppContent() {
             }
           />
           <Route path="forgot-password" element={<ForgotPasswordForm />} />
-          <Route path="reset-password/:token" element={<ResetPasswordForm />} />
+          <Route path="password/resetpassword/:id" element={<ResetPasswordForm />} />
 
           <Route
             path="dashboard"

@@ -5,6 +5,7 @@ const sequelize = require("./config/database");
 const User = require("./models/user");
 const Expense = require("./models/expense");
 const Order = require("./models/order");
+const ForgotPasswordRequest = require("./models/forgotPasswordRequest");
 
 const authRoutes = require("./routes/authRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
@@ -28,7 +29,7 @@ app.get("/", (req, res) => {
 });
 
 sequelize
-  .sync({ alter: true })
+  .sync({ force: false })
   .then(() => {
     console.log("Database synced");
     console.log("Run 'node scripts/migrateUserTotals.js' to populate existing user totals");

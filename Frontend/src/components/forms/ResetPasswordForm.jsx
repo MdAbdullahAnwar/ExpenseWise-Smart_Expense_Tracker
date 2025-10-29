@@ -5,13 +5,13 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
 import Toast from "../ui/toast";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 
 const API_BASE = "http://localhost:5000";
 
 export default function ResetPasswordForm() {
-  const { token } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -40,7 +40,7 @@ export default function ResetPasswordForm() {
 
     setLoading(true);
     try {
-      const res = await axios.post(`${API_BASE}/password/resetpassword/${token}`, { password });
+      const res = await axios.post(`${API_BASE}/password/resetpassword/${id}`, { password });
       
       if (res.data.success) {
         setSuccess(true);

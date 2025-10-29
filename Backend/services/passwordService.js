@@ -1,7 +1,7 @@
 const brevo = require("@getbrevo/brevo");
-const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
+const ForgotPasswordRequest = require("../models/forgotPasswordRequest");
 const sequelize = require("../config/database");
 
 exports.sendPasswordResetEmail = async (email) => {
@@ -13,14 +13,12 @@ exports.sendPasswordResetEmail = async (email) => {
       throw new Error("User not found with this email");
     }
 
-    const resetToken = crypto.randomBytes(32).toString("hex");
-    const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour
+    const forgotPasswordRequest = await ForgotPasswordRequest.create(
+      { UserId: user.id },
+      { transaction }
+    );
 
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = resetTokenExpiry;
-    await user.save({ transaction });
-
-    const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/password/resetpassword/${forgotPasswordRequest.id}`;
 
     const apiInstance = new brevo.TransactionalEmailsApi();
     apiInstance.setApiKey(
@@ -44,7 +42,7 @@ exports.sendPasswordResetEmail = async (email) => {
             </div>
             <p style="color: #666; font-size: 14px;">Or copy and paste this link in your browser:</p>
             <p style="color: #4F46E5; word-break: break-all; font-size: 14px;">${resetUrl}</p>
-            <p style="color: #666; font-size: 14px; margin-top: 30px;">This link will expire in 1 hour.</p>
+            <p style="color: #666; font-size: 14px; margin-top: 30px;">This link can only be used once.</p>
             <p style="color: #666; font-size: 14px;">If you didn't make this request, you can safely ignore this email.</p>
             <p style="margin-top: 30px;">Best regards,<br/>ExpenseWise Team</p>
           </div>
@@ -64,29 +62,29 @@ exports.sendPasswordResetEmail = async (email) => {
   }
 };
 
-exports.resetPassword = async (token, newPassword) => {
+exports.resetPassword = async (requestId, newPassword) => {
   const transaction = await sequelize.transaction();
   try {
-    const user = await User.findOne({
-      where: {
-        resetPasswordToken: token,
-      },
+    const forgotPasswordRequest = await ForgotPasswordRequest.findOne({
+      where: { id: requestId },
+      include: [User],
       transaction,
     });
 
-    if (!user) {
-      throw new Error("Invalid or expired reset token");
+    if (!forgotPasswordRequest) {
+      throw new Error("Invalid reset link");
     }
 
-    if (new Date() > user.resetPasswordExpires) {
-      throw new Error("Reset token has expired");
+    if (!forgotPasswordRequest.isActive) {
+      throw new Error("This reset link has already been used");
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-    user.resetPasswordToken = null;
-    user.resetPasswordExpires = null;
-    await user.save({ transaction });
+    forgotPasswordRequest.User.password = hashedPassword;
+    await forgotPasswordRequest.User.save({ transaction });
+
+    forgotPasswordRequest.isActive = false;
+    await forgotPasswordRequest.save({ transaction });
 
     await transaction.commit();
   } catch (error) {
