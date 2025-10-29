@@ -13,7 +13,7 @@ import { Pagination } from "../ui/Pagination";
 import { usePagination } from "../../hooks/usePagination";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Download, Lock, Edit2, Save, X, Trash2, Target } from "lucide-react";
+import { Download, Lock, Edit2, Save, X, Trash2, Target, Search } from "lucide-react";
 import Toast from "../ui/toast";
 
 const BudgetCard = ({ totalAmount }) => {
@@ -89,13 +89,15 @@ const BudgetCard = ({ totalAmount }) => {
 
 export default function ExpenseListPage() {
   const [expenses, setExpenses] = useState([]);
+  const [filteredExpenses, setFilteredExpenses] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [toast, setToast] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const navigate = useNavigate();
   const isPremium = useSelector((state) => state.user.isPremium);
 
-  const pagination = usePagination(expenses, 10, 'expense-list-per-page');
+  const pagination = usePagination(filteredExpenses, 10, 'expense-list-per-page');
 
   const token = localStorage.getItem("token");
 
@@ -118,6 +120,7 @@ export default function ExpenseListPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setExpenses(res.data);
+      setFilteredExpenses(res.data);
     } catch (err) {
       console.error(err);
       setToast({
@@ -127,12 +130,27 @@ export default function ExpenseListPage() {
     }
   };
 
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    if (!term.trim()) {
+      setFilteredExpenses(expenses);
+    } else {
+      const filtered = expenses.filter(exp => 
+        exp.description.toLowerCase().includes(term.toLowerCase()) ||
+        exp.category.toLowerCase().includes(term.toLowerCase()) ||
+        exp.amount.toString().includes(term)
+      );
+      setFilteredExpenses(filtered);
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this expense?")) return;
 
     const previousExpenses = [...expenses];
     const optimisticExpenses = expenses.filter((exp) => exp.id !== id);
     setExpenses(optimisticExpenses);
+    handleSearch(searchTerm);
 
     try {
       await axios.delete(`http://localhost:5000/expense/${id}`, {
@@ -176,6 +194,7 @@ export default function ExpenseListPage() {
       exp.id === id ? { ...exp, ...editForm } : exp
     );
     setExpenses(optimisticExpenses);
+    handleSearch(searchTerm);
 
     try {
       await axios.put(`http://localhost:5000/expense/${id}`, editForm, {
@@ -402,8 +421,44 @@ export default function ExpenseListPage() {
           </div>
         )}
 
+        {/* Search Bar */}
+        {expenses.length > 0 && (
+          <div className="mb-6">
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
+                <Search className="w-4 h-4 text-white" />
+              </div>
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder="Search expenses by description, category, or amount..."
+                className="w-full pl-14 md:pl-16 pr-12 py-3 md:py-4 bg-card border-2 border-border 
+                         rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary
+                         shadow-lg hover:shadow-xl text-foreground placeholder-muted-foreground font-semibold
+                         transition-all duration-300 text-sm md:text-base"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => handleSearch("")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            {searchTerm && (
+              <div className="text-center mt-4">
+                <span className="text-sm text-muted-foreground">
+                  Found <span className="font-bold text-primary">{filteredExpenses.length}</span> expense{filteredExpenses.length !== 1 ? 's' : ''} matching "{searchTerm}"
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
         <Card className="bg-card animate-fade-in border-border shadow-xl">
-          {expenses.length > 0 ? (
+          {filteredExpenses.length > 0 ? (
             <div className="overflow-hidden">
               <div className="bg-primary/5 px-6 py-4 border-b border-border">
                 <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
