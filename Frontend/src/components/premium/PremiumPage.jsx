@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PremiumPurchase from "./PremiumPurchase";
+import PremiumExpenseTracker from "./PremiumExpenseTracker";
 import { Crown } from "lucide-react";
 
 const API_BASE = "http://localhost:5000";
@@ -22,6 +23,12 @@ export default function PremiumPage({ userInfo, setUserInfo }) {
     );
   }
 
+  // If user is premium, show the expense tracker
+  if (isPremium) {
+    return <PremiumExpenseTracker />;
+  }
+
+  // If not premium, show the purchase page
   return (
     <div className="min-h-screen bg-background py-12 pb-24">
       {/* Background decoration */}
