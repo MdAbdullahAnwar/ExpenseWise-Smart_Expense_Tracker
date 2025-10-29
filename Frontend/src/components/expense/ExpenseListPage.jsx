@@ -95,7 +95,7 @@ export default function ExpenseListPage() {
   const navigate = useNavigate();
   const isPremium = useSelector((state) => state.user.isPremium);
 
-  const pagination = usePagination(expenses, 5);
+  const pagination = usePagination(expenses, 10, 'expense-list-per-page');
 
   const token = localStorage.getItem("token");
 

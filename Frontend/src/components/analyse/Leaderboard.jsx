@@ -4,6 +4,8 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
+import { Pagination } from "../ui/Pagination";
+import { usePagination } from "../../hooks/usePagination";
 import { ArrowLeft, Lock, Trophy, Medal, Award, TrendingUp, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Crown } from "lucide-react";
 import Toast from "../ui/toast";
 
@@ -13,8 +15,8 @@ export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  
+  const pagination = usePagination(leaderboard, 5, 'leaderboard-per-page');
 
   useEffect(() => {
     if (isPremium) {
@@ -55,16 +57,7 @@ export default function Leaderboard() {
     return "from-blue-500 to-purple-600";
   };
 
-  // Pagination
-  const totalPages = Math.ceil(leaderboard.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentUsers = leaderboard.slice(startIndex, endIndex);
 
-  const goToFirstPage = () => setCurrentPage(1);
-  const goToLastPage = () => setCurrentPage(totalPages);
-  const goToPrevPage = () => setCurrentPage(prev => Math.max(1, prev - 1));
-  const goToNextPage = () => setCurrentPage(prev => Math.min(totalPages, prev + 1));
 
   if (!isPremium) {
     return (
@@ -149,7 +142,7 @@ export default function Leaderboard() {
             ) : leaderboard.length > 0 ? (
               <>
                 <div className="space-y-3">
-                  {currentUsers.map((user) => (
+                  {pagination.currentItems.map((user) => (
                     <div
                       key={user.id}
                       className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-300 hover:shadow-lg ${
@@ -200,52 +193,7 @@ export default function Leaderboard() {
                   ))}
                 </div>
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 mt-6 pt-6 border-t border-border">
-                    <Button
-                      onClick={goToFirstPage}
-                      disabled={currentPage === 1}
-                      variant="outline"
-                      size="sm"
-                      className="cursor-pointer"
-                    >
-                      First
-                    </Button>
-                    <Button
-                      onClick={goToPrevPage}
-                      disabled={currentPage === 1}
-                      variant="outline"
-                      size="sm"
-                      className="cursor-pointer"
-                    >
-                      Prev
-                    </Button>
-                    <div className="px-4 py-2 bg-primary/10 rounded-lg">
-                      <span className="text-sm font-medium text-foreground">
-                        Page {currentPage} of {totalPages}
-                      </span>
-                    </div>
-                    <Button
-                      onClick={goToNextPage}
-                      disabled={currentPage === totalPages}
-                      variant="outline"
-                      size="sm"
-                      className="cursor-pointer"
-                    >
-                      Next
-                    </Button>
-                    <Button
-                      onClick={goToLastPage}
-                      disabled={currentPage === totalPages}
-                      variant="outline"
-                      size="sm"
-                      className="cursor-pointer"
-                    >
-                      Last
-                    </Button>
-                  </div>
-                )}
+                <Pagination {...pagination} />
               </>
             ) : (
               <div className="text-center py-12">

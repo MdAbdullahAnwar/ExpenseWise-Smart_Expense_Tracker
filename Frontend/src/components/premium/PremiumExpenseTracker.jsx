@@ -19,7 +19,7 @@ const PremiumExpenseTracker = () => {
   const monthlyBudget = Number(useSelector((state) => state.user?.monthlyBudget) || 0);
   const token = localStorage.getItem("token");
   
-  const pagination = usePagination(filteredExpenses, 5);
+  const pagination = usePagination(filteredExpenses, 10, 'premium-expenses-per-page');
 
   const fetchExpenses = async () => {
     try {
