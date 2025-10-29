@@ -3,6 +3,8 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Pagination } from "../ui/Pagination";
+import { usePagination } from "../../hooks/usePagination";
 import { Download, Lock, Calendar, TrendingUp, TrendingDown, DollarSign, BarChart3 } from "lucide-react";
 import Toast from "../ui/toast";
 
@@ -16,6 +18,8 @@ const PremiumExpenseTracker = () => {
   const isPremium = useSelector((state) => state.user?.isPremium);
   const monthlyBudget = Number(useSelector((state) => state.user?.monthlyBudget) || 0);
   const token = localStorage.getItem("token");
+  
+  const pagination = usePagination(filteredExpenses, 5);
 
   const fetchExpenses = async () => {
     try {
@@ -348,7 +352,7 @@ const PremiumExpenseTracker = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {filteredExpenses.map((exp) => (
+                    {pagination.currentItems.map((exp) => (
                       <tr key={exp.id} className="group hover:bg-accent transition-all duration-200">
                         <td className="py-4 px-6 text-sm text-muted-foreground">
                           {new Date(exp.createdAt).toLocaleDateString()}
@@ -376,6 +380,7 @@ const PremiumExpenseTracker = () => {
                     ))}
                   </tbody>
                 </table>
+                <Pagination {...pagination} />
               </div>
             ) : (
               <div className="text-center py-12">
