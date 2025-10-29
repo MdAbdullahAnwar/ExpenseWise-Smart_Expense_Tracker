@@ -1,67 +1,86 @@
 const Expense = require("../models/expense");
 const User = require("../models/user");
+const sequelize = require("../config/database");
 const { Op } = require("sequelize");
 
 exports.addExpense = async (userId, expenseData) => {
-  const { amount, description, category } = expenseData;
-  
-  const expense = await Expense.create({ 
-    amount, 
-    description, 
-    category, 
-    UserId: userId 
-  });
+  const transaction = await sequelize.transaction();
+  try {
+    const { amount, description, category } = expenseData;
+    
+    const expense = await Expense.create({ 
+      amount, 
+      description, 
+      category, 
+      UserId: userId 
+    }, { transaction });
 
-  const user = await User.findByPk(userId);
-  console.log('Before update:', { totalExpenses: user.totalExpenses, totalTransactions: user.totalTransactions });
-  
-  user.totalExpenses = parseFloat(user.totalExpenses) + parseFloat(amount);
-  user.totalTransactions = user.totalTransactions + 1;
-  await user.save();
-  
-  console.log('After update:', { totalExpenses: user.totalExpenses, totalTransactions: user.totalTransactions });
+    const user = await User.findByPk(userId, { transaction });
+    user.totalExpenses = parseFloat(user.totalExpenses) + parseFloat(amount);
+    user.totalTransactions = user.totalTransactions + 1;
+    await user.save({ transaction });
 
-  return expense;
+    await transaction.commit();
+    return expense;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
 };
 
 exports.updateExpense = async (userId, expenseId, expenseData) => {
-  const { amount, description, category } = expenseData;
-  
-  const expense = await Expense.findOne({ where: { id: expenseId } });
-  if (!expense) throw new Error("Expense not found");
-  if (expense.UserId !== userId) throw new Error("Not authorized");
+  const transaction = await sequelize.transaction();
+  try {
+    const { amount, description, category } = expenseData;
+    
+    const expense = await Expense.findOne({ where: { id: expenseId }, transaction });
+    if (!expense) throw new Error("Expense not found");
+    if (expense.UserId !== userId) throw new Error("Not authorized");
 
-  const oldAmount = parseFloat(expense.amount);
-  const newAmount = parseFloat(amount);
-  const difference = newAmount - oldAmount;
+    const oldAmount = parseFloat(expense.amount);
+    const newAmount = parseFloat(amount);
+    const difference = newAmount - oldAmount;
 
-  expense.amount = amount;
-  expense.description = description;
-  expense.category = category;
-  await expense.save();
+    expense.amount = amount;
+    expense.description = description;
+    expense.category = category;
+    await expense.save({ transaction });
 
-  if (difference !== 0) {
-    const user = await User.findByPk(userId);
-    user.totalExpenses = parseFloat(user.totalExpenses) + difference;
-    await user.save();
+    if (difference !== 0) {
+      const user = await User.findByPk(userId, { transaction });
+      user.totalExpenses = parseFloat(user.totalExpenses) + difference;
+      await user.save({ transaction });
+    }
+
+    await transaction.commit();
+    return expense;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
   }
-
-  return expense;
 };
 
 exports.deleteExpense = async (userId, expenseId) => {
-  const expense = await Expense.findOne({ where: { id: expenseId } });
-  if (!expense) throw new Error("Expense not found");
-  if (expense.UserId !== userId) throw new Error("Not authorized");
+  const transaction = await sequelize.transaction();
+  try {
+    const expense = await Expense.findOne({ where: { id: expenseId }, transaction });
+    if (!expense) throw new Error("Expense not found");
+    if (expense.UserId !== userId) throw new Error("Not authorized");
 
-  const amount = parseFloat(expense.amount);
-  
-  await expense.destroy();
+    const amount = parseFloat(expense.amount);
+    
+    await expense.destroy({ transaction });
 
-  const user = await User.findByPk(userId);
-  user.totalExpenses = parseFloat(user.totalExpenses) - amount;
-  user.totalTransactions = user.totalTransactions - 1;
-  await user.save();
+    const user = await User.findByPk(userId, { transaction });
+    user.totalExpenses = parseFloat(user.totalExpenses) - amount;
+    user.totalTransactions = user.totalTransactions - 1;
+    await user.save({ transaction });
+
+    await transaction.commit();
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
 };
 
 exports.getExpenses = async (userId) => {

@@ -1,29 +1,37 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const sequelize = require("../config/database");
 
 exports.signup = async (name, email, password) => {
-  const existingUser = await User.findOne({ where: { email } });
-  if (existingUser) {
-    throw new Error("User already exists");
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await User.create({ name, email, password: hashedPassword });
-
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-
-  return {
-    token,
-    userId: user.id,
-    userInfo: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      isPremium: user.isPremium,
-      monthlyBudget: user.monthlyBudget
+  const transaction = await sequelize.transaction();
+  try {
+    const existingUser = await User.findOne({ where: { email }, transaction });
+    if (existingUser) {
+      throw new Error("User already exists");
     }
-  };
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({ name, email, password: hashedPassword }, { transaction });
+
+    await transaction.commit();
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+
+    return {
+      token,
+      userId: user.id,
+      userInfo: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        isPremium: user.isPremium,
+        monthlyBudget: user.monthlyBudget
+      }
+    };
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
 };
 
 exports.login = async (email, password) => {
@@ -53,13 +61,20 @@ exports.login = async (email, password) => {
 };
 
 exports.updateBudget = async (userId, monthlyBudget) => {
-  const user = await User.findByPk(userId);
-  if (!user) {
-    throw new Error("User not found");
+  const transaction = await sequelize.transaction();
+  try {
+    const user = await User.findByPk(userId, { transaction });
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    user.monthlyBudget = monthlyBudget;
+    await user.save({ transaction });
+
+    await transaction.commit();
+    return user.monthlyBudget;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
   }
-
-  user.monthlyBudget = monthlyBudget;
-  await user.save();
-
-  return user.monthlyBudget;
 };

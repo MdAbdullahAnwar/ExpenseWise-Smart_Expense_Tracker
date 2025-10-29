@@ -92,16 +92,20 @@ export default function ExpenseListPage() {
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this expense?")) return;
     
+    const previousExpenses = [...expenses];
+    const optimisticExpenses = expenses.filter((exp) => exp.id !== id);
+    setExpenses(optimisticExpenses);
+    
     try {
       await axios.delete(`http://localhost:5000/expense/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setExpenses(expenses.filter((exp) => exp.id !== id));
       setToast({ message: "Expense deleted!", type: "success" });
     } catch (err) {
       console.error(err);
+      setExpenses(previousExpenses);
       setToast({
-        message: err.response?.data?.message || "Failed to delete expense",
+        message: err.response?.data?.message || "Transaction failed. Expense not deleted.",
         type: "error",
       });
     }
@@ -127,6 +131,12 @@ export default function ExpenseListPage() {
       return;
     }
 
+    const previousExpenses = [...expenses];
+    const optimisticExpenses = expenses.map(exp => 
+      exp.id === id ? { ...exp, ...editForm } : exp
+    );
+    setExpenses(optimisticExpenses);
+    
     try {
       await axios.put(
         `http://localhost:5000/expense/${id}`,
@@ -134,16 +144,14 @@ export default function ExpenseListPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      setExpenses(expenses.map(exp => 
-        exp.id === id ? { ...exp, ...editForm } : exp
-      ));
       setEditingId(null);
       setEditForm({});
       setToast({ message: "Expense updated successfully!", type: "success" });
     } catch (err) {
       console.error(err);
+      setExpenses(previousExpenses);
       setToast({
-        message: err.response?.data?.message || "Failed to update expense",
+        message: err.response?.data?.message || "Transaction failed. Changes reverted.",
         type: "error",
       });
     }

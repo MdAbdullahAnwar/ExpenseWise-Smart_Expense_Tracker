@@ -113,8 +113,9 @@ export default function ExpensePage() {
       return;
     }
 
+    const previousExpenses = [...expenses];
     try {
-      await axios.post(
+      const res = await axios.post(
         "http://localhost:5000/expense/add",
         {
           amount: form.amount,
@@ -131,11 +132,12 @@ export default function ExpensePage() {
         customCategory: "",
       });
       setToast({ message: "Expense added successfully!", type: "success" });
-      fetchExpenses();
+      await fetchExpenses();
     } catch (err) {
       console.error(err);
+      setExpenses(previousExpenses);
       setToast({
-        message: err.response?.data?.message || "Failed to add expense.",
+        message: err.response?.data?.message || "Transaction failed. Please try again.",
         type: "error",
       });
     }
