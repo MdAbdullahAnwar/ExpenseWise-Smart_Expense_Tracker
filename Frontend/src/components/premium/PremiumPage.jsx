@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import PremiumPurchase from "./PremiumPurchase";
 import { Crown } from "lucide-react";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE = "http://localhost:5000";
 
 export default function PremiumPage({ userInfo, setUserInfo }) {
   const [isPremium, setIsPremium] = useState(userInfo?.isPremium || false);

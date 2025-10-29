@@ -12,6 +12,8 @@ import Layout from "./components/layout/Layout";
 import LandingPage from "./components/landing/LandingPage";
 import SignupForm from "./components/forms/SignupForm";
 import LoginForm from "./components/forms/LoginForm";
+import ForgotPasswordForm from "./components/forms/ForgotPasswordForm";
+import ResetPasswordForm from "./components/forms/ResetPasswordForm";
 import ExpensePage from "./components/expense/ExpensePage";
 import ExpenseListPage from "./components/expense/ExpenseListPage";
 import ProfilePage from "./components/profile/ProfilePage";
@@ -76,6 +78,8 @@ function AppContent() {
               <LoginForm setUserId={setUserId} setUserInfo={setUserInfo} />
             }
           />
+          <Route path="forgot-password" element={<ForgotPasswordForm />} />
+          <Route path="reset-password/:token" element={<ResetPasswordForm />} />
 
           <Route
             path="dashboard"
