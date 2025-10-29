@@ -43,7 +43,6 @@ export default function ExpenseTrends() {
     let processed = [];
 
     if (filterType === "week") {
-      // Last 7 days with day names
       const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
       for (let i = 6; i >= 0; i--) {
         const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
@@ -57,7 +56,6 @@ export default function ExpenseTrends() {
         });
       }
     } else if (filterType === "month") {
-      // Last 30 days
       for (let i = 29; i >= 0; i--) {
         const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
         const dayExpenses = data.filter((exp) => {
@@ -70,7 +68,6 @@ export default function ExpenseTrends() {
         });
       }
     } else if (filterType === "year") {
-      // Last 12 months
       const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       processed = months.map((month, index) => {
         const monthExpenses = data.filter((exp) => {
@@ -153,9 +150,9 @@ export default function ExpenseTrends() {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
-                    <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+                    <Tooltip formatter={(value) => `₹${value.toFixed(2)}`} />
                     <Legend />
-                    <Bar dataKey="amount" fill="#10b981" name="Expenses ($)" />
+                    <Bar dataKey="amount" fill="#10b981" name="Expenses (₹)" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

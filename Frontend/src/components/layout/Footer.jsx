@@ -102,7 +102,7 @@ export default function Footer() {
               © {currentYear} ExpenseWise. All rights reserved.
             </p>
             <p className="text-sm text-muted-foreground flex items-center gap-1 mt-2 md:mt-0">
-              Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> by Your Team
+              Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> by MD Abdullah Anwar
             </p>
           </div>
         </div>

@@ -143,10 +143,9 @@ export default function ExpensePage() {
 
   return (
     <div className="bg-background p-4 md:p-8 pb-12">
-      {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-purple-500/5 to-pink-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 dark:from-blue-500/5 dark:to-cyan-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 rounded-full blur-3xl"></div>
       </div>
       
       <div className="relative max-w-2xl mx-auto space-y-6 mb-8">
@@ -169,7 +168,7 @@ export default function ExpensePage() {
                       <p className={`text-xl sm:text-2xl font-bold bg-gradient-to-r ${budgetColor.gradient} bg-clip-text text-transparent`}>
                         {Math.min(budgetPercentage, 999).toFixed(0)}%
                       </p>
-                      <p className="text-xs text-muted-foreground whitespace-nowrap">${totalAmount.toFixed(2)} / ${monthlyBudget}</p>
+                      <p className="text-xs text-muted-foreground whitespace-nowrap">₹{totalAmount.toFixed(2)} / ₹{monthlyBudget}</p>
                     </div>
                   )}
                   <Button
@@ -246,7 +245,7 @@ export default function ExpensePage() {
               <div className="space-y-2">
                 <Label>Amount</Label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground font-medium">$</span>
+                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground font-medium">₹</span>
                   <Input
                     type="number"
                     name="amount"

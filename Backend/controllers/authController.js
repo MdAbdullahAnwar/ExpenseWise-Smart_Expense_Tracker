@@ -1,6 +1,4 @@
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("../models/user");
+const authService = require("../services/authService");
 
 exports.signup = async (req, res) => {
   const { name, email, password } = req.body;
@@ -8,17 +6,12 @@ exports.signup = async (req, res) => {
     return res.status(400).json({ message: "All fields are required" });
 
   try {
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) 
-      return res.status(400).json({ message: "User already exists" });
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashedPassword });
-
-    res.status(201).json({ message: "Signup successful", userId: user.id });
+    const result = await authService.signup(name, email, password);
+    res.status(201).json({ message: "Signup successful", ...result });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    const status = err.message === "User already exists" ? 400 : 500;
+    res.status(status).json({ message: err.message || "Server error" });
   }
 };
 
@@ -28,26 +21,31 @@ exports.login = async (req, res) => {
     return res.status(400).json({ message: "Email and password are required" });
 
   try {
-    const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const result = await authService.login(email, password);
+    res.status(200).json({ message: "Login successful", ...result });
+  } catch (err) {
+    console.error(err);
+    const status = err.message === "User not found" ? 404 : err.message === "Invalid password" ? 401 : 500;
+    res.status(status).json({ message: err.message || "Server error" });
+  }
+};
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: "Invalid password" });
+exports.updateBudget = async (req, res) => {
+  const { monthlyBudget } = req.body;
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+  if (monthlyBudget === undefined || monthlyBudget < 0) {
+    return res.status(400).json({ message: "Invalid budget amount" });
+  }
 
+  try {
+    const updatedBudget = await authService.updateBudget(req.userId, monthlyBudget);
     res.status(200).json({ 
-      message: "Login successful", 
-      token, 
-      userId: user.id,
-      userInfo: {
-        name: user.name,
-        email: user.email,
-        isPremium: user.isPremium
-      }
+      message: "Budget updated successfully",
+      monthlyBudget: updatedBudget
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    const status = err.message === "User not found" ? 404 : 500;
+    res.status(status).json({ message: err.message || "Server error" });
   }
 };

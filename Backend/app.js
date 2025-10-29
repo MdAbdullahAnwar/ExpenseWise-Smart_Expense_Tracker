@@ -4,7 +4,7 @@ const sequelize = require("./config/database");
 
 const User = require("./models/user");
 const Expense = require("./models/expense");
-const Order = require("./models/order"); // Add this
+const Order = require("./models/order");
 
 const authRoutes = require("./routes/authRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
@@ -25,10 +25,12 @@ app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// Sync DB (creates tables)
 sequelize
   .sync({ alter: true })
-  .then(() => console.log("Database synced"))
+  .then(() => {
+    console.log("Database synced");
+    console.log("Run 'node scripts/migrateUserTotals.js' to populate existing user totals");
+  })
   .catch((err) => console.error("Database sync error:", err));
 
 module.exports = app;

@@ -47,7 +47,7 @@ export default function PremiumPurchase({ userInfo, setUserInfo }) {
         amount: order.amount,
         currency: order.currency,
         name: "ExpenseWise",
-        description: "Premium Membership - $9.99/year",
+        description: "Premium Membership - ₹499/year",
         order_id: order.id,
         prefill: { name: userInfo.name, email: userInfo.email },
         theme: { color: "#F59E0B" },
@@ -151,7 +151,7 @@ export default function PremiumPurchase({ userInfo, setUserInfo }) {
           Upgrade to Premium
         </h2>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
-          Unlock unlimited features for $9.99/year
+          Unlock unlimited features for ₹499/year
         </p>
         <Button
           onClick={handleBuyPremium}

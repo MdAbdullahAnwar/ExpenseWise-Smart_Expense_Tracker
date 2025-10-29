@@ -110,13 +110,13 @@ export default function Leaderboard() {
                 <div className="text-center p-4 bg-primary/5 rounded-lg">
                   <p className="text-sm text-muted-foreground mb-1">Your Expenses</p>
                   <p className="text-2xl font-bold text-foreground">
-                    ${leaderboard.find(u => u.isCurrentUser)?.totalExpenses || "0.00"}
+                    ₹{leaderboard.find(u => u.isCurrentUser)?.totalExpenses || "0.00"}
                   </p>
                 </div>
                 <div className="text-center p-4 bg-primary/5 rounded-lg">
                   <p className="text-sm text-muted-foreground mb-1">Top Spender</p>
                   <p className="text-2xl font-bold text-foreground">
-                    ${leaderboard[0]?.totalExpenses || "0.00"}
+                    ₹{leaderboard[0]?.totalExpenses || "0.00"}
                   </p>
                 </div>
               </div>
@@ -189,7 +189,7 @@ export default function Leaderboard() {
 
                       <div className="text-right flex-shrink-0">
                         <p className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                          ${user.totalExpenses}
+                          ₹{user.totalExpenses}
                         </p>
                         <p className="text-xs text-muted-foreground flex items-center justify-end gap-1">
                           <TrendingUp className="w-3 h-3" />

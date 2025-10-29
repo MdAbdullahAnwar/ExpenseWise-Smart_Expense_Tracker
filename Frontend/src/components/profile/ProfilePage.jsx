@@ -29,7 +29,7 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
     name: userInfo?.name || "",
     email: userInfo?.email || "",
     phone: userInfo?.phone || "",
-    currency: userInfo?.currency || "USD",
+    currency: userInfo?.currency || "INR",
     timezone: userInfo?.timezone || "UTC"
   });
 
@@ -39,7 +39,7 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
         name: userInfo.name || "",
         email: userInfo.email || "",
         phone: userInfo.phone || "",
-        currency: userInfo.currency || "USD",
+        currency: userInfo.currency || "INR",
         timezone: userInfo.timezone || "UTC"
       });
     }
@@ -96,7 +96,7 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
       name: userInfo?.name || "",
       email: userInfo?.email || "",
       phone: userInfo?.phone || "",
-      currency: userInfo?.currency || "USD",
+      currency: userInfo?.currency || "INR",
       timezone: userInfo?.timezone || "UTC"
     });
     setIsEditing(false);
@@ -245,10 +245,10 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
                       disabled={!isEditing}
                       className="w-full mt-1 px-3 py-2 border rounded-lg bg-background border-input disabled:bg-muted disabled:cursor-not-allowed text-foreground"
                     >
+                      <option value="INR">INR (₹)</option>
                       <option value="USD">USD ($)</option>
                       <option value="EUR">EUR (€)</option>
                       <option value="GBP">GBP (£)</option>
-                      <option value="INR">INR (₹)</option>
                       <option value="JPY">JPY (¥)</option>
                       <option value="CAD">CAD ($)</option>
                       <option value="AUD">AUD ($)</option>

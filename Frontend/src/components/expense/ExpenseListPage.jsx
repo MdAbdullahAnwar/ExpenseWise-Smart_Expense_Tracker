@@ -35,8 +35,8 @@ const BudgetCard = ({ totalAmount }) => {
         {monthlyBudget > 0 && (
           <div className="mt-3 space-y-1">
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>${totalAmount.toFixed(2)}</span>
-              <span>${monthlyBudget}</span>
+              <span>₹{totalAmount.toFixed(2)}</span>
+              <span>₹{monthlyBudget}</span>
             </div>
             <div className="h-2 bg-muted rounded-full overflow-hidden">
               <div 
@@ -251,7 +251,7 @@ export default function ExpenseListPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                   </svg>
                 </div>
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-1">${totalAmount.toFixed(2)}</h3>
+                <h3 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-1">₹{totalAmount.toFixed(2)}</h3>
                 <p className="text-sm font-medium text-muted-foreground">Total Expenses</p>
               </CardContent>
             </Card>
@@ -323,7 +323,7 @@ export default function ExpenseListPage() {
                                 </svg>
                               </div>
                               <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                                ${parseFloat(exp.amount).toFixed(2)}
+                                ₹{parseFloat(exp.amount).toFixed(2)}
                               </span>
                             </div>
                           )}

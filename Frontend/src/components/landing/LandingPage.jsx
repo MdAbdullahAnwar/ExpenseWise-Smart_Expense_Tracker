@@ -133,7 +133,7 @@ const DashboardPreview = () => {
   const budgetPercentage = monthlyBudget > 0 ? (totalAmount / monthlyBudget) * 100 : 0;
   
   // Use real data if logged in, otherwise demo data
-  const totalExpenseValue = token ? `$${totalAmount.toFixed(2)}` : "$2,850";
+  const totalExpenseValue = token ? `₹${totalAmount.toFixed(2)}` : "₹49,999";
   const totalExpenseWidth = token ? `${Math.min((totalAmount / 5000) * 100, 100)}%` : "75%";
   const transactionValue = token ? transactionCount.toString() : "142";
   const transactionWidth = token ? `${Math.min((transactionCount / 200) * 100, 100)}%` : "50%";
@@ -241,9 +241,10 @@ const TestimonialCard = ({ testimonial, isActive }) => (
   </div>
 );
 
-const PricingCard = ({ plan, isAuthenticated }) => {
+const PricingCard = ({ plan, isAuthenticated, isPremium }) => {
   const navigate = useNavigate();
-  const isDisabled = !plan.highlighted && isAuthenticated;
+  const isCurrentPlan = isPremium && plan.highlighted;
+  const isDisabled = (!plan.highlighted && isAuthenticated) || isCurrentPlan;
   
   return (
   <div className={`relative p-8 rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer flex flex-col ${
@@ -254,7 +255,7 @@ const PricingCard = ({ plan, isAuthenticated }) => {
     {plan.highlighted && (
       <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
         <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-sm font-bold px-4 py-1 rounded-full shadow-lg">
-          MOST POPULAR
+          {isCurrentPlan ? "CURRENT PLAN" : "MOST POPULAR"}
         </span>
       </div>
     )}
@@ -303,8 +304,8 @@ const PricingCard = ({ plan, isAuthenticated }) => {
           ? "bg-white text-blue-600 hover:bg-gray-100"
           : "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
       }`}>
-      {plan.cta}
-      <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+      {isCurrentPlan ? "Active" : plan.cta}
+      {!isCurrentPlan && <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />}
     </button>
   </div>
   );
@@ -314,6 +315,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const isAuthenticated = !!localStorage.getItem('token');
+  const isPremium = useSelector((state) => state.user.isPremium);
 
   const features = [
     {
@@ -381,7 +383,7 @@ export default function LandingPage() {
   const pricingPlans = [
     {
       name: "Free",
-      price: "$0",
+      price: "₹0",
       period: "forever",
       features: [
         "Up to 50 expenses/month",
@@ -396,7 +398,7 @@ export default function LandingPage() {
     },
     {
       name: "Premium",
-      price: "$9.99",
+      price: "₹499",
       period: "per year",
       features: [
         "Unlimited expenses",
@@ -415,7 +417,7 @@ export default function LandingPage() {
 
   const stats = [
     { label: "Active Users", value: "50K+", icon: Users },
-    { label: "Expenses Tracked", value: "$10M+", icon: DollarSign },
+    { label: "Expenses Tracked", value: "₹10Cr+", icon: DollarSign },
     { label: "Time Saved", value: "1000+ hrs", icon: Clock },
     { label: "Countries", value: "120+", icon: Globe }
   ];
@@ -538,7 +540,7 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {pricingPlans.slice(0, 2).map((plan, index) => (
-              <PricingCard key={index} plan={plan} isAuthenticated={isAuthenticated} />
+              <PricingCard key={index} plan={plan} isAuthenticated={isAuthenticated} isPremium={isPremium} />
             ))}
           </div>
         </div>

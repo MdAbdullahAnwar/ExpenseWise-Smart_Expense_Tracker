@@ -14,7 +14,7 @@ const Order = sequelize.define("Order", {
   },
   currency: {
     type: DataTypes.STRING,
-    defaultValue: "INR",
+    defaultValue: "USD",
   },
   status: {
     type: DataTypes.ENUM("PENDING", "SUCCESSFUL", "FAILED"),

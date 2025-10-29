@@ -113,7 +113,7 @@ export default function CategoryBreakdown() {
                           <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[entry.name] || "#64748b"} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value) => `$${value}`} />
+                      <Tooltip formatter={(value) => `₹${value}`} />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>
@@ -126,7 +126,7 @@ export default function CategoryBreakdown() {
                         <div className="w-4 h-4 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[item.name] || "#64748b" }}></div>
                         <span className="font-medium">{item.name}</span>
                       </div>
-                      <span className="font-bold text-lg">${item.value}</span>
+                      <span className="font-bold text-lg">₹{item.value}</span>
                     </div>
                   ))}
                 </div>
