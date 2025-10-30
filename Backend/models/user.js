@@ -34,6 +34,14 @@ const User = sequelize.define("User", {
     defaultValue: 0,
     allowNull: false,
   },
+  phone: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  profilePhoto: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
 });
 
 module.exports = User;

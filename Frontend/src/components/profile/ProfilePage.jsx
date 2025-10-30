@@ -5,32 +5,18 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import Toast from "../ui/toast";
-import {
-  User,
-  Mail,
-  Calendar,
-  Settings,
-  Shield,
-  Bell,
-  CreditCard,
-  Download,
-  Camera,
-  Save,
-  Edit2,
-  Phone,
-  Globe
-} from "lucide-react";
+import { User, Mail, Camera, Save, Edit2, Phone, Shield } from "lucide-react";
 
 export default function ProfilePage({ userInfo, setUserInfo }) {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
+  const [stats, setStats] = useState({ totalExpenses: 0, monthlyTotal: 0, totalCount: 0 });
   const [formData, setFormData] = useState({
     name: userInfo?.name || "",
     email: userInfo?.email || "",
     phone: userInfo?.phone || "",
-    currency: userInfo?.currency || "INR",
-    timezone: userInfo?.timezone || "UTC"
+    profilePhoto: userInfo?.profilePhoto || ""
   });
 
   useEffect(() => {
@@ -39,14 +25,56 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
         name: userInfo.name || "",
         email: userInfo.email || "",
         phone: userInfo.phone || "",
-        currency: userInfo.currency || "INR",
-        timezone: userInfo.timezone || "UTC"
+        profilePhoto: userInfo.profilePhoto || ""
       });
     }
+    fetchStats();
   }, [userInfo]);
+
+  const fetchStats = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get("http://localhost:5000/expense", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      const expenses = res.data;
+      const totalExpenses = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
+      
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+      
+      const monthlyTotal = expenses
+        .filter(exp => {
+          const expDate = new Date(exp.createdAt);
+          return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+        })
+        .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
+      
+      setStats({ totalExpenses, monthlyTotal, totalCount: expenses.length });
+    } catch (error) {
+      console.error("Failed to fetch stats:", error);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        setToast({ message: "Image size should be less than 2MB", type: "error" });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, profilePhoto: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -63,15 +91,10 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
       const response = await axios.put(
         "http://localhost:5000/user/profile",
         formData,
-        {
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const updatedUserInfo = { ...userInfo, ...formData };
+      const updatedUserInfo = response.data.userInfo;
       localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
       
       if (setUserInfo) {
@@ -96,15 +119,13 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
       name: userInfo?.name || "",
       email: userInfo?.email || "",
       phone: userInfo?.phone || "",
-      currency: userInfo?.currency || "INR",
-      timezone: userInfo?.timezone || "UTC"
+      profilePhoto: userInfo?.profilePhoto || ""
     });
     setIsEditing(false);
   };
 
   return (
     <div className="bg-background p-4 md:p-8 pb-12">
-      {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-purple-400/10 rounded-full blur-3xl"></div>
@@ -114,12 +135,23 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
         <Card className="bg-card border-border p-6 md:p-8 mb-8">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="relative">
-              <div className="w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-xl">
-                {formData.name?.charAt(0).toUpperCase() || "U"}
-              </div>
-              <button className="absolute bottom-0 right-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors shadow-lg">
+              {formData.profilePhoto ? (
+                <img src={formData.profilePhoto} alt="Profile" className="w-32 h-32 rounded-full object-cover shadow-xl" />
+              ) : (
+                <div className="w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-xl">
+                  {formData.name?.charAt(0).toUpperCase() || "U"}
+                </div>
+              )}
+              <label htmlFor="photo-upload" className="absolute bottom-0 right-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors shadow-lg cursor-pointer">
                 <Camera className="w-5 h-5" />
-              </button>
+                <input
+                  id="photo-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  className="hidden"
+                />
+              </label>
             </div>
             
             <div className="text-center md:text-left flex-1">
@@ -130,10 +162,12 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
                 <Mail className="w-4 h-4" />
                 {formData.email}
               </p>
-              <p className="text-sm text-muted-foreground mt-2 flex items-center justify-center md:justify-start gap-2">
-                <Calendar className="w-4 h-4" />
-                Member since {new Date().toLocaleDateString()}
-              </p>
+              {userInfo?.isPremium && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-amber-400 to-orange-500 text-white mt-2">
+                  <Shield className="w-3 h-3 mr-1" />
+                  Premium Member
+                </span>
+              )}
             </div>
 
             <div className="flex gap-2">
@@ -159,11 +193,7 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
                       </>
                     )}
                   </Button>
-                  <Button
-                    onClick={handleCancel}
-                    variant="outline"
-                    disabled={loading}
-                  >
+                  <Button onClick={handleCancel} variant="outline" disabled={loading}>
                     Cancel
                   </Button>
                 </>
@@ -180,151 +210,108 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
           </div>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <Card className="bg-card border-border p-6">
-              <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Personal Information
-              </h2>
-              
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="flex items-center gap-1">
-                      <User className="w-3 h-3" />
-                      Full Name
-                    </Label>
-                    <Input
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className="mt-1"
-                      placeholder="Enter your name"
-                    />
-                  </div>
-                  <div>
-                    <Label className="flex items-center gap-1">
-                      <Mail className="w-3 h-3" />
-                      Email Address
-                    </Label>
-                    <Input
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className="mt-1"
-                      placeholder="email@example.com"
-                    />
-                  </div>
-                  <div>
-                    <Label className="flex items-center gap-1">
-                      <Phone className="w-3 h-3" />
-                      Phone Number
-                    </Label>
-                    <Input
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      placeholder="+1 (555) 000-0000"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label className="flex items-center gap-1">
-                      <Globe className="w-3 h-3" />
-                      Currency
-                    </Label>
-                    <select
-                      name="currency"
-                      value={formData.currency}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className="w-full mt-1 px-3 py-2 border rounded-lg bg-background border-input disabled:bg-muted disabled:cursor-not-allowed text-foreground"
-                    >
-                      <option value="INR">INR (₹)</option>
-                      <option value="USD">USD ($)</option>
-                      <option value="EUR">EUR (€)</option>
-                      <option value="GBP">GBP (£)</option>
-                      <option value="JPY">JPY (¥)</option>
-                      <option value="CAD">CAD ($)</option>
-                      <option value="AUD">AUD ($)</option>
-                    </select>
-                  </div>
+        <div className="grid grid-cols-1 gap-8">
+          <Card className="bg-card border-border p-6">
+            <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+              <User className="w-5 h-5" />
+              Personal Information
+            </h2>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label className="flex items-center gap-1">
+                    <User className="w-3 h-3" />
+                    Full Name
+                  </Label>
+                  <Input
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className="mt-1"
+                    placeholder="Enter your name"
+                  />
                 </div>
-              </form>
-            </Card>
-
-            <Card className="bg-card border-border p-6 mt-8">
-              <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-                <Settings className="w-5 h-5" />
-                Quick Actions
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button variant="outline" className="justify-start hover:bg-primary/10">
-                  <Download className="w-4 h-4 mr-2" />
-                  Export Data
-                </Button>
-                <Button variant="outline" className="justify-start hover:bg-primary/10">
-                  <Bell className="w-4 h-4 mr-2" />
-                  Notifications
-                </Button>
-                <Button variant="outline" className="justify-start hover:bg-primary/10">
-                  <Shield className="w-4 h-4 mr-2" />
-                  Privacy Settings
-                </Button>
-                <Button variant="outline" className="justify-start hover:bg-primary/10">
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Billing
-                </Button>
-              </div>
-            </Card>
-          </div>
-
-          <div>
-            <Card className="bg-card border-border p-6">
-              <h2 className="text-xl font-bold text-foreground mb-6">
-                Account Stats
-              </h2>
-              
-              <div className="space-y-4">
-                <div className="p-4 bg-primary/5 rounded-lg border border-border">
-                  <p className="text-sm text-muted-foreground">Total Expenses</p>
-                  <p className="text-2xl font-bold text-foreground">245</p>
+                <div>
+                  <Label className="flex items-center gap-1">
+                    <Mail className="w-3 h-3" />
+                    Email Address
+                  </Label>
+                  <Input
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className="mt-1"
+                    placeholder="email@example.com"
+                  />
                 </div>
-                <div className="p-4 bg-primary/5 rounded-lg border border-border">
-                  <p className="text-sm text-muted-foreground">This Month</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {formData.currency === "USD" && "$"}
-                    {formData.currency === "EUR" && "€"}
-                    {formData.currency === "GBP" && "£"}
-                    {formData.currency === "INR" && "₹"}
-                    {formData.currency === "JPY" && "¥"}
-                    {formData.currency === "CAD" && "C$"}
-                    {formData.currency === "AUD" && "A$"}
-                    3,420
-                  </p>
-                </div>
-                <div className="p-4 bg-primary/5 rounded-lg border border-border">
-                  <p className="text-sm text-muted-foreground">Saved</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {formData.currency === "USD" && "$"}
-                    {formData.currency === "EUR" && "€"}
-                    {formData.currency === "GBP" && "£"}
-                    {formData.currency === "INR" && "₹"}
-                    {formData.currency === "JPY" && "¥"}
-                    {formData.currency === "CAD" && "C$"}
-                    {formData.currency === "AUD" && "A$"}
-                    580
-                  </p>
+                <div>
+                  <Label className="flex items-center gap-1">
+                    <Phone className="w-3 h-3" />
+                    Phone Number
+                  </Label>
+                  <Input
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    placeholder="+91 98765 43210"
+                    className="mt-1"
+                  />
                 </div>
               </div>
-            </Card>
-          </div>
+            </form>
+          </Card>
+
+          <Card className="bg-card border-border p-6">
+            <h2 className="text-xl font-bold text-foreground mb-6">
+              Account Statistics
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-6 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl border border-border hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-muted-foreground">Total Transactions</p>
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-foreground">{stats.totalCount}</p>
+                <p className="text-xs text-muted-foreground mt-1">All time</p>
+              </div>
+              
+              <div className="p-6 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-xl border border-border hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-muted-foreground">This Month</p>
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-foreground">₹{stats.monthlyTotal.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground mt-1">Current month spending</p>
+              </div>
+              
+              <div className="p-6 bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-xl border border-border hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
+                  <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-foreground">₹{stats.totalExpenses.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground mt-1">Lifetime expenses</p>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
 

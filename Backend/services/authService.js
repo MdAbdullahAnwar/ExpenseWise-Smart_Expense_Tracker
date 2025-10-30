@@ -24,6 +24,8 @@ exports.signup = async (name, email, password) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        phone: user.phone,
+        profilePhoto: user.profilePhoto,
         isPremium: user.isPremium,
         monthlyBudget: user.monthlyBudget
       }
@@ -54,6 +56,8 @@ exports.login = async (email, password) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      phone: user.phone,
+      profilePhoto: user.profilePhoto,
       isPremium: user.isPremium,
       monthlyBudget: user.monthlyBudget
     }
@@ -73,6 +77,37 @@ exports.updateBudget = async (userId, monthlyBudget) => {
 
     await transaction.commit();
     return user.monthlyBudget;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};
+
+exports.updateProfile = async (userId, profileData) => {
+  const transaction = await sequelize.transaction();
+  try {
+    const user = await User.findByPk(userId, { transaction });
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    user.name = profileData.name;
+    user.email = profileData.email;
+    if (profileData.phone !== undefined) user.phone = profileData.phone;
+    if (profileData.profilePhoto !== undefined) user.profilePhoto = profileData.profilePhoto;
+    
+    await user.save({ transaction });
+    await transaction.commit();
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      profilePhoto: user.profilePhoto,
+      isPremium: user.isPremium,
+      monthlyBudget: user.monthlyBudget
+    };
   } catch (error) {
     await transaction.rollback();
     throw error;
