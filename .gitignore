@@ -1,7 +1,3 @@
-# Documentation (local only)
-docs/
-*.md
-
 # Dependencies
 node_modules/
 

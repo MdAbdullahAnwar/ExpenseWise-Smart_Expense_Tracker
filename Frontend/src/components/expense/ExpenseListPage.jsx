@@ -147,12 +147,14 @@ export default function ExpenseListPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this expense?")) return;
-
     const previousExpenses = [...expenses];
+    const previousFiltered = [...filteredExpenses];
+    
     const optimisticExpenses = expenses.filter((exp) => exp.id !== id);
+    const optimisticFiltered = filteredExpenses.filter((exp) => exp.id !== id);
+    
     setExpenses(optimisticExpenses);
-    handleSearch(searchTerm);
+    setFilteredExpenses(optimisticFiltered);
 
     try {
       await axios.delete(`http://localhost:5000/expense/${id}`, {
@@ -162,10 +164,11 @@ export default function ExpenseListPage() {
     } catch (err) {
       console.error(err);
       setExpenses(previousExpenses);
+      setFilteredExpenses(previousFiltered);
       setToast({
         message:
           err.response?.data?.message ||
-          "Transaction failed. Expense not deleted.",
+          "Failed to delete expense.",
         type: "error",
       });
     }
