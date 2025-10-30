@@ -6,12 +6,13 @@ const { Op } = require("sequelize");
 exports.addExpense = async (userId, expenseData) => {
   const transaction = await sequelize.transaction();
   try {
-    const { amount, description, category } = expenseData;
+    const { amount, description, category, note } = expenseData;
     
     const expense = await Expense.create({ 
       amount, 
       description, 
-      category, 
+      category,
+      note,
       UserId: userId 
     }, { transaction });
 
@@ -31,7 +32,7 @@ exports.addExpense = async (userId, expenseData) => {
 exports.updateExpense = async (userId, expenseId, expenseData) => {
   const transaction = await sequelize.transaction();
   try {
-    const { amount, description, category } = expenseData;
+    const { amount, description, category, note } = expenseData;
     
     const expense = await Expense.findOne({ where: { id: expenseId }, transaction });
     if (!expense) throw new Error("Expense not found");
@@ -44,6 +45,7 @@ exports.updateExpense = async (userId, expenseId, expenseData) => {
     expense.amount = amount;
     expense.description = description;
     expense.category = category;
+    expense.note = note;
     await expense.save({ transaction });
 
     if (difference !== 0) {

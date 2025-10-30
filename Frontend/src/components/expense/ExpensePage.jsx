@@ -16,6 +16,7 @@ export default function ExpensePage() {
     description: "",
     category: "",
     customCategory: "",
+    note: "",
   });
   const [toast, setToast] = useState(null);
   const [expenses, setExpenses] = useState([]);
@@ -121,6 +122,7 @@ export default function ExpensePage() {
           amount: form.amount,
           description: form.description,
           category: finalCategory,
+          note: form.note,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -130,6 +132,7 @@ export default function ExpensePage() {
         description: "",
         category: "",
         customCategory: "",
+        note: "",
       });
       setToast({ message: "Expense added successfully!", type: "success" });
       await fetchExpenses();
@@ -300,6 +303,16 @@ export default function ExpensePage() {
                     />
                   </div>
                 )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>Note (Optional)</Label>
+                <Input
+                  name="note"
+                  value={form.note}
+                  onChange={handleChange}
+                  placeholder="Add a note or comment"
+                />
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-6">

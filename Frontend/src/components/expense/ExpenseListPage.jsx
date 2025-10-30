@@ -13,8 +13,9 @@ import { Pagination } from "../ui/Pagination";
 import { usePagination } from "../../hooks/usePagination";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Download, Lock, Edit2, Save, X, Trash2, Target, Search } from "lucide-react";
+import { Download, Lock, Edit2, Save, X, Trash2, Target, Search, Eye } from "lucide-react";
 import Toast from "../ui/toast";
+import ExpenseDetailModal from "./ExpenseDetailModal";
 
 const BudgetCard = ({ totalAmount }) => {
   const monthlyBudget = useSelector((state) => state.user.monthlyBudget);
@@ -94,6 +95,7 @@ export default function ExpenseListPage() {
   const [toast, setToast] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
+  const [selectedExpense, setSelectedExpense] = useState(null);
   const navigate = useNavigate();
   const isPremium = useSelector((state) => state.user.isPremium);
 
@@ -175,6 +177,7 @@ export default function ExpenseListPage() {
       amount: exp.amount,
       description: exp.description,
       category: exp.category,
+      note: exp.note || "",
     });
   };
 
@@ -201,6 +204,7 @@ export default function ExpenseListPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      await fetchExpenses();
       setEditingId(null);
       setEditForm({});
       setToast({ message: "Expense updated successfully!", type: "success" });
@@ -466,19 +470,22 @@ export default function ExpenseListPage() {
                 </h3>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full table-fixed">
                   <thead>
                     <tr className="bg-muted border-b-2 border-border">
-                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider">
+                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[180px]">
                         Amount
                       </th>
-                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider">
+                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[200px]">
                         Description
                       </th>
-                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider">
+                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[150px]">
                         Category
                       </th>
-                      <th className="text-center py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider">
+                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[200px]">
+                        Note
+                      </th>
+                      <th className="text-center py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[200px]">
                         Actions
                       </th>
                     </tr>
@@ -540,7 +547,7 @@ export default function ExpenseListPage() {
                               className="w-full"
                             />
                           ) : (
-                            <span className="font-semibold text-foreground">
+                            <span className="font-semibold text-foreground block truncate" title={exp.description}>
                               {exp.description}
                             </span>
                           )}
@@ -570,6 +577,25 @@ export default function ExpenseListPage() {
                           )}
                         </td>
                         <td className="py-5 px-6">
+                          {editingId === exp.id ? (
+                            <Input
+                              value={editForm.note}
+                              onChange={(e) =>
+                                setEditForm({
+                                  ...editForm,
+                                  note: e.target.value,
+                                })
+                              }
+                              placeholder="Add note"
+                              className="w-full"
+                            />
+                          ) : (
+                            <span className="text-sm text-muted-foreground italic block truncate" title={exp.note || "No note"}>
+                              {exp.note || "No note"}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-5 px-6">
                           <div className="flex items-center justify-center gap-2">
                             {editingId === exp.id ? (
                               <>
@@ -594,21 +620,29 @@ export default function ExpenseListPage() {
                             ) : (
                               <>
                                 <Button
+                                  onClick={() => setSelectedExpense(exp)}
+                                  size="sm"
+                                  className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                                  title="View"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                                <Button
                                   onClick={() => handleEdit(exp)}
                                   size="sm"
                                   className="bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+                                  title="Edit"
                                 >
-                                  <Edit2 className="w-4 h-4 mr-1" />
-                                  Edit
+                                  <Edit2 className="w-4 h-4" />
                                 </Button>
                                 <Button
                                   onClick={() => handleDelete(exp.id)}
                                   variant="destructive"
                                   size="sm"
                                   className="cursor-pointer"
+                                  title="Delete"
                                 >
-                                  <Trash2 className="w-4 h-4 mr-1" />
-                                  Delete
+                                  <Trash2 className="w-4 h-4" />
                                 </Button>
                               </>
                             )}
@@ -676,6 +710,13 @@ export default function ExpenseListPage() {
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}
+        />
+      )}
+
+      {selectedExpense && (
+        <ExpenseDetailModal
+          expense={selectedExpense}
+          onClose={() => setSelectedExpense(null)}
         />
       )}
     </div>
