@@ -97,7 +97,7 @@ export default function AnalysePage() {
                 </div>
                 <h3 className="text-2xl font-bold mb-2">User Leaderboard</h3>
                 <p className="text-muted-foreground">
-                  See how you rank among premium users and compete for the top spot
+                  See how you rank among all users and compete for the top spot
                 </p>
               </div>
             </CardContent>

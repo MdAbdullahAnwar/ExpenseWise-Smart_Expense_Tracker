@@ -67,7 +67,7 @@ export default function Leaderboard() {
             <Lock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-2">Premium Feature</h2>
             <p className="text-muted-foreground mb-6">
-              Upgrade to Premium to access the leaderboard and compete with other users
+              Upgrade to Premium to access the leaderboard and see how you rank among all users
             </p>
             <Button onClick={() => navigate("/premium")} size="lg" className="cursor-pointer">
               Upgrade to Premium
@@ -125,10 +125,10 @@ export default function Leaderboard() {
               </div>
               <div>
                 <CardTitle className="text-3xl font-bold bg-gradient-to-r from-yellow-600 via-amber-600 to-orange-600 bg-clip-text text-transparent">
-                  Premium Leaderboard
+                  User Leaderboard
                 </CardTitle>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Top spenders among premium members
+                  See how you rank among all users and compete for the top spot
                 </p>
               </div>
             </div>
