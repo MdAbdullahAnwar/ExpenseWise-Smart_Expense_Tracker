@@ -142,24 +142,28 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
                   {formData.name?.charAt(0).toUpperCase() || "U"}
                 </div>
               )}
-              <label htmlFor="photo-upload" className="absolute bottom-0 right-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors shadow-lg cursor-pointer">
-                <Camera className="w-5 h-5" />
-                <input
-                  id="photo-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoChange}
-                  className="hidden"
-                />
-              </label>
-              {formData.profilePhoto && (
-                <button
-                  onClick={() => setFormData({ ...formData, profilePhoto: "" })}
-                  className="absolute top-0 right-0 w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white hover:bg-red-700 transition-colors shadow-lg cursor-pointer"
-                  title="Remove photo"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+              {isEditing && (
+                <>
+                  <label htmlFor="photo-upload" className="absolute bottom-0 right-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors shadow-lg cursor-pointer">
+                    <Camera className="w-5 h-5" />
+                    <input
+                      id="photo-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                    />
+                  </label>
+                  {formData.profilePhoto && (
+                    <button
+                      onClick={() => setFormData({ ...formData, profilePhoto: "" })}
+                      className="absolute top-0 right-0 w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white hover:bg-red-700 transition-colors shadow-lg cursor-pointer"
+                      title="Remove photo"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </>
               )}
             </div>
             
