@@ -68,6 +68,13 @@ const PremiumExpenseTracker = () => {
           return expDate >= monthStart;
         });
         break;
+      case "yearly":
+        const yearStart = new Date(now.getFullYear(), 0, 1);
+        filtered = expenseData.filter(exp => {
+          const expDate = new Date(exp.expenseDate || exp.createdAt);
+          return expDate >= yearStart;
+        });
+        break;
       default:
         filtered = expenseData;
     }
@@ -192,6 +199,7 @@ const PremiumExpenseTracker = () => {
       case "daily": return "Today's";
       case "weekly": return "This Week's";
       case "monthly": return "This Month's";
+      case "yearly": return "This Year's";
       default: return "All";
     }
   };
@@ -258,7 +266,8 @@ const PremiumExpenseTracker = () => {
               {[
                 { key: "daily", label: "Daily", icon: Calendar },
                 { key: "weekly", label: "Weekly", icon: TrendingUp },
-                { key: "monthly", label: "Monthly", icon: BarChart3 }
+                { key: "monthly", label: "Monthly", icon: BarChart3 },
+                { key: "yearly", label: "Yearly", icon: TrendingDown }
               ].map(({ key, label, icon: Icon }) => (
                 <Button
                   key={key}
