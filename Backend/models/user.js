@@ -42,6 +42,10 @@ const User = sequelize.define("User", {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  lastBudgetReset: {
+    type: DataTypes.DATEONLY,
+    allowNull: true,
+  },
 });
 
 module.exports = User;

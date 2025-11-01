@@ -121,8 +121,13 @@ export default function ExpenseListPage() {
       const res = await axios.get("http://localhost:5000/expense", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setExpenses(res.data);
-      setFilteredExpenses(res.data);
+      const sorted = res.data.sort((a, b) => {
+        const dateA = new Date(a.expenseDate || a.createdAt);
+        const dateB = new Date(b.expenseDate || b.createdAt);
+        return dateB - dateA;
+      });
+      setExpenses(sorted);
+      setFilteredExpenses(sorted);
     } catch (err) {
       console.error(err);
       setToast({
@@ -181,6 +186,7 @@ export default function ExpenseListPage() {
       description: exp.description,
       category: exp.category,
       note: exp.note || "",
+      expenseDate: exp.expenseDate || new Date(exp.createdAt).toISOString().split('T')[0],
     });
   };
 
@@ -476,19 +482,22 @@ export default function ExpenseListPage() {
                 <table className="w-full table-fixed">
                   <thead>
                     <tr className="bg-muted border-b-2 border-border">
-                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[180px]">
-                        Amount
-                      </th>
-                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[200px]">
-                        Description
+                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[120px]">
+                        Date
                       </th>
                       <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[150px]">
+                        Amount
+                      </th>
+                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[180px]">
+                        Description
+                      </th>
+                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[130px]">
                         Category
                       </th>
-                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[200px]">
+                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[150px]">
                         Note
                       </th>
-                      <th className="text-center py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[200px]">
+                      <th className="text-center py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[180px]">
                         Actions
                       </th>
                     </tr>
@@ -499,6 +508,11 @@ export default function ExpenseListPage() {
                         key={exp.id}
                         className="group hover:bg-accent transition-all duration-200"
                       >
+                        <td className="py-5 px-6">
+                          <span className="text-sm text-muted-foreground">
+                            {exp.expenseDate ? new Date(exp.expenseDate).toLocaleDateString() : new Date(exp.createdAt).toLocaleDateString()}
+                          </span>
+                        </td>
                         <td className="py-5 px-6">
                           {editingId === exp.id ? (
                             <Input

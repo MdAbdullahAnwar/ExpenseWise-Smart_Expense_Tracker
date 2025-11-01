@@ -2,12 +2,12 @@ const expenseService = require("../services/expenseService");
 
 exports.addExpense = async (req, res) => {
   try {
-    const { amount, description, category, note } = req.body;
+    const { amount, description, category, note, expenseDate } = req.body;
 
     if (!amount || !description || !category)
       return res.status(400).json({ message: "All fields are required" });
 
-    const expense = await expenseService.addExpense(req.userId, { amount, description, category, note });
+    const expense = await expenseService.addExpense(req.userId, { amount, description, category, note, expenseDate });
     res.status(201).json(expense);
   } catch (err) {
     console.error(err);
@@ -27,8 +27,8 @@ exports.getExpenses = async (req, res) => {
 
 exports.updateExpense = async (req, res) => {
   try {
-    const { amount, description, category, note } = req.body;
-    const expense = await expenseService.updateExpense(req.userId, req.params.id, { amount, description, category, note });
+    const { amount, description, category, note, expenseDate } = req.body;
+    const expense = await expenseService.updateExpense(req.userId, req.params.id, { amount, description, category, note, expenseDate });
     res.status(200).json(expense);
   } catch (err) {
     console.error(err);

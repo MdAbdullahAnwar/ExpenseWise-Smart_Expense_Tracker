@@ -65,10 +65,10 @@ export default function ExpenseDetailModal({ expense, onClose }) {
             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
               <div className="flex items-center gap-2 mb-2">
                 <Calendar className="w-4 h-4 text-orange-500" />
-                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Date</span>
+                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Expense Date</span>
               </div>
               <p className="text-base font-semibold text-gray-800 dark:text-gray-200">
-                {new Date(expense.createdAt).toLocaleDateString('en-IN', {
+                {new Date(expense.expenseDate || expense.createdAt).toLocaleDateString('en-IN', {
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric'
@@ -76,16 +76,17 @@ export default function ExpenseDetailModal({ expense, onClose }) {
               </p>
             </div>
 
-            {/* Time */}
+            {/* Created At */}
             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
               <div className="flex items-center gap-2 mb-2">
                 <Calendar className="w-4 h-4 text-teal-500" />
-                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Time</span>
+                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Added On</span>
               </div>
               <p className="text-base font-semibold text-gray-800 dark:text-gray-200">
-                {new Date(expense.createdAt).toLocaleTimeString('en-IN', {
-                  hour: '2-digit',
-                  minute: '2-digit'
+                {new Date(expense.createdAt).toLocaleDateString('en-IN', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric'
                 })}
               </p>
             </div>

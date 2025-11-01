@@ -17,6 +17,7 @@ export default function ExpensePage() {
     category: "",
     customCategory: "",
     note: "",
+    expenseDate: new Date().toISOString().split('T')[0],
   });
   const [toast, setToast] = useState(null);
   const [expenses, setExpenses] = useState([]);
@@ -70,22 +71,25 @@ export default function ExpensePage() {
   const budgetColor = getBudgetColor();
 
   const handleBudgetUpdate = async () => {
-    if (budgetInput < 0) {
+    const budget = parseFloat(budgetInput) || 0;
+    if (budget < 0) {
       setToast({ message: "Budget cannot be negative", type: "error" });
       return;
     }
 
     try {
+      const budget = parseFloat(budgetInput) || 0;
       await axios.put(
         "http://localhost:5000/user/budget",
-        { monthlyBudget: budgetInput },
+        { monthlyBudget: budget },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      dispatch(setMonthlyBudget(budgetInput));
+      dispatch(setMonthlyBudget(budget));
       const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-      const updatedUserInfo = { ...userInfo, monthlyBudget: budgetInput };
+      const updatedUserInfo = { ...userInfo, monthlyBudget: budget };
       localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
+      setBudgetInput(budget);
       
       setToast({ message: "Budget updated successfully!", type: "success" });
       setIsEditingBudget(false);
@@ -123,6 +127,7 @@ export default function ExpensePage() {
           description: form.description,
           category: finalCategory,
           note: form.note,
+          expenseDate: form.expenseDate,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -133,6 +138,7 @@ export default function ExpensePage() {
         category: "",
         customCategory: "",
         note: "",
+        expenseDate: new Date().toISOString().split('T')[0],
       });
       setToast({ message: "Expense added successfully!", type: "success" });
       await fetchExpenses();
@@ -188,12 +194,19 @@ export default function ExpensePage() {
               ) : (
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                   <Input
-                    type="number"
+                    type="text"
                     value={budgetInput}
-                    onChange={(e) => setBudgetInput(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                        setBudgetInput(val === '' ? '' : val);
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const val = e.target.value;
+                      setBudgetInput(val === '' ? 0 : parseFloat(val) || 0);
+                    }}
                     placeholder="0.00"
-                    step="0.01"
-                    min="0"
                     className="w-24 sm:w-32 flex-shrink-0"
                   />
                   <Button
@@ -303,6 +316,17 @@ export default function ExpensePage() {
                     />
                   </div>
                 )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>Date</Label>
+                <Input
+                  type="date"
+                  name="expenseDate"
+                  value={form.expenseDate}
+                  onChange={handleChange}
+                  max={new Date().toISOString().split('T')[0]}
+                />
               </div>
 
               <div className="space-y-2">

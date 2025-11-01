@@ -47,7 +47,7 @@ export default function ExpenseTrends() {
       for (let i = 6; i >= 0; i--) {
         const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
         const dayExpenses = data.filter((exp) => {
-          const expDate = new Date(exp.createdAt);
+          const expDate = new Date(exp.expenseDate || exp.createdAt);
           return expDate.toDateString() === date.toDateString();
         });
         processed.push({
@@ -59,7 +59,7 @@ export default function ExpenseTrends() {
       for (let i = 29; i >= 0; i--) {
         const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
         const dayExpenses = data.filter((exp) => {
-          const expDate = new Date(exp.createdAt);
+          const expDate = new Date(exp.expenseDate || exp.createdAt);
           return expDate.toDateString() === date.toDateString();
         });
         processed.push({
@@ -71,7 +71,7 @@ export default function ExpenseTrends() {
       const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       processed = months.map((month, index) => {
         const monthExpenses = data.filter((exp) => {
-          const expDate = new Date(exp.createdAt);
+          const expDate = new Date(exp.expenseDate || exp.createdAt);
           return expDate.getMonth() === index && expDate.getFullYear() === now.getFullYear();
         });
         return {

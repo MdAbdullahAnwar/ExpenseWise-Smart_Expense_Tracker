@@ -19,6 +19,10 @@ const Expense = sequelize.define("Expense", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  expenseDate: {
+    type: DataTypes.DATEONLY,
+    allowNull: false,
+  },
 });
 
 Expense.belongsTo(User, { constraints: true, onDelete: "CASCADE" });

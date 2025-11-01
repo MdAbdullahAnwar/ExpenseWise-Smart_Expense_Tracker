@@ -48,7 +48,7 @@ const PremiumExpenseTracker = () => {
       case "daily":
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         filtered = expenseData.filter(exp => {
-          const expDate = new Date(exp.createdAt);
+          const expDate = new Date(exp.expenseDate || exp.createdAt);
           return expDate >= today;
         });
         break;
@@ -57,20 +57,26 @@ const PremiumExpenseTracker = () => {
         weekStart.setDate(now.getDate() - now.getDay());
         weekStart.setHours(0, 0, 0, 0);
         filtered = expenseData.filter(exp => {
-          const expDate = new Date(exp.createdAt);
+          const expDate = new Date(exp.expenseDate || exp.createdAt);
           return expDate >= weekStart;
         });
         break;
       case "monthly":
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         filtered = expenseData.filter(exp => {
-          const expDate = new Date(exp.createdAt);
+          const expDate = new Date(exp.expenseDate || exp.createdAt);
           return expDate >= monthStart;
         });
         break;
       default:
         filtered = expenseData;
     }
+
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.expenseDate || a.createdAt);
+      const dateB = new Date(b.expenseDate || b.createdAt);
+      return dateB - dateA;
+    });
 
     setFilteredExpenses(filtered);
   };
@@ -135,7 +141,7 @@ const PremiumExpenseTracker = () => {
             <tbody>
               ${filteredExpenses.map(exp => `
                 <tr>
-                  <td>${new Date(exp.createdAt).toLocaleDateString()}</td>
+                  <td>${new Date(exp.expenseDate || exp.createdAt).toLocaleDateString()}</td>
                   <td class="${exp.category === 'Salary' ? 'income' : 'expense'}">
                     ${exp.category === 'Salary' ? '+' : '-'}₹${parseFloat(exp.amount).toFixed(2)}
                   </td>
@@ -172,7 +178,7 @@ const PremiumExpenseTracker = () => {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthlyExpenses = expenses.filter(exp => {
-    const expDate = new Date(exp.createdAt);
+    const expDate = new Date(exp.expenseDate || exp.createdAt);
     return expDate >= monthStart && exp.category !== "Salary";
   }).reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
 
@@ -281,7 +287,7 @@ const PremiumExpenseTracker = () => {
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-1">
-                ₹{monthlyBudget.toFixed(2)}
+                {monthlyBudget > 0 ? `₹${monthlyBudget.toFixed(2)}` : 'Not Set'}
               </h3>
               <p className="text-sm font-medium text-muted-foreground">Monthly Budget</p>
             </CardContent>
@@ -294,7 +300,7 @@ const PremiumExpenseTracker = () => {
                 <DollarSign className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-1">
-                ₹{(monthlyBudget - monthlyExpenses).toFixed(2)}
+                {monthlyBudget > 0 ? `₹${(monthlyBudget - monthlyExpenses).toFixed(2)}` : 'Not Set'}
               </h3>
               <p className="text-sm font-medium text-muted-foreground">Remaining Budget this Month</p>
             </CardContent>
@@ -355,7 +361,7 @@ const PremiumExpenseTracker = () => {
                     {pagination.currentItems.map((exp) => (
                       <tr key={exp.id} className="group hover:bg-accent transition-all duration-200">
                         <td className="py-4 px-6 text-sm text-muted-foreground">
-                          {new Date(exp.createdAt).toLocaleDateString()}
+                          {new Date(exp.expenseDate || exp.createdAt).toLocaleDateString()}
                         </td>
                         <td className="py-4 px-6">
                           <span className={`text-lg font-bold ${
