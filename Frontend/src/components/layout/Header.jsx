@@ -139,9 +139,13 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
-                    {userInfo?.name?.charAt(0).toUpperCase() || "U"}
-                  </div>
+                  {userInfo?.profilePhoto ? (
+                    <img src={userInfo.profilePhoto} alt="Profile" className="w-8 h-8 rounded-full object-cover shadow-md" />
+                  ) : (
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                      {userInfo?.name?.charAt(0).toUpperCase() || "U"}
+                    </div>
+                  )}
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     {userInfo?.name || "User"}
                   </span>
@@ -266,9 +270,13 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 dark:text-gray-300 border-t border-gray-200 dark:border-gray-700 mt-2 pt-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
-                    {userInfo?.name?.charAt(0).toUpperCase() || "U"}
-                  </div>
+                  {userInfo?.profilePhoto ? (
+                    <img src={userInfo.profilePhoto} alt="Profile" className="w-8 h-8 rounded-full object-cover shadow-md" />
+                  ) : (
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                      {userInfo?.name?.charAt(0).toUpperCase() || "U"}
+                    </div>
+                  )}
                   <div>
                     <p className="text-sm font-medium">{userInfo?.name || "User"}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">View Profile</p>

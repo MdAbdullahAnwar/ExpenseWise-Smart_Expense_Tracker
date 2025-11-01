@@ -58,7 +58,17 @@ export default function ExpensePage() {
     }
   };
 
-  const totalAmount = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  
+  const totalAmount = expenses
+    .filter(exp => {
+      const expDate = new Date(exp.expenseDate || exp.createdAt);
+      return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+    })
+    .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
+  
   const budgetPercentage = monthlyBudget > 0 ? (totalAmount / monthlyBudget) * 100 : 0;
   
   const getBudgetColor = () => {

@@ -265,10 +265,16 @@ export default function ExpenseListPage() {
     setToast({ message: "CSV downloaded successfully!", type: "success" });
   };
 
-  const totalAmount = expenses.reduce(
-    (sum, exp) => sum + parseFloat(exp.amount || 0),
-    0
-  );
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  
+  const totalAmount = expenses
+    .filter(exp => {
+      const expDate = new Date(exp.expenseDate || exp.createdAt);
+      return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+    })
+    .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
   const categoryTotals = expenses.reduce((acc, exp) => {
     acc[exp.category] = (acc[exp.category] || 0) + parseFloat(exp.amount || 0);
     return acc;

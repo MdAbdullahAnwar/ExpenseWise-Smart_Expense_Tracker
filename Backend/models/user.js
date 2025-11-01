@@ -39,7 +39,7 @@ const User = sequelize.define("User", {
     allowNull: true,
   },
   profilePhoto: {
-    type: DataTypes.TEXT,
+    type: DataTypes.TEXT('long'),
     allowNull: true,
   },
   lastBudgetReset: {

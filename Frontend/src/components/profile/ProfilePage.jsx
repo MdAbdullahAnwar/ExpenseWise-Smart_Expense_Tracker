@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import Toast from "../ui/toast";
-import { User, Mail, Camera, Save, Edit2, Phone, Shield } from "lucide-react";
+import { User, Mail, Camera, Save, Edit2, Phone, Shield, X } from "lucide-react";
 
 export default function ProfilePage({ userInfo, setUserInfo }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -152,6 +152,15 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
                   className="hidden"
                 />
               </label>
+              {formData.profilePhoto && (
+                <button
+                  onClick={() => setFormData({ ...formData, profilePhoto: "" })}
+                  className="absolute top-0 right-0 w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white hover:bg-red-700 transition-colors shadow-lg cursor-pointer"
+                  title="Remove photo"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
             </div>
             
             <div className="text-center md:text-left flex-1">
