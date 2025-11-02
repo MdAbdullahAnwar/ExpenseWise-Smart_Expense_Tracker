@@ -47,7 +47,7 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
       
       const monthlyTotal = expenses
         .filter(exp => {
-          const expDate = new Date(exp.createdAt);
+          const expDate = new Date(exp.expenseDate || exp.createdAt);
           return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
         })
         .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
