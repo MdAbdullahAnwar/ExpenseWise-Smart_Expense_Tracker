@@ -25,12 +25,19 @@ export default function CategoryBreakdown() {
   const isPremium = useSelector((state) => state.user.isPremium);
   const [expenses, setExpenses] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
+  const [timeRange, setTimeRange] = useState('monthly');
 
   useEffect(() => {
     if (isPremium) {
       fetchExpenses();
     }
   }, [isPremium]);
+
+  useEffect(() => {
+    if (expenses.length > 0) {
+      processCategoryData(expenses);
+    }
+  }, [timeRange, expenses]);
 
   const fetchExpenses = async () => {
     try {
@@ -39,14 +46,32 @@ export default function CategoryBreakdown() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setExpenses(res.data);
-      processCategoryData(res.data);
     } catch (err) {
       console.error(err);
     }
   };
 
+  const filterExpensesByTimeRange = (data) => {
+    const now = new Date();
+    return data.filter(exp => {
+      const expDate = new Date(exp.expenseDate || exp.createdAt);
+      
+      if (timeRange === 'weekly') {
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return expDate >= weekAgo;
+      } else if (timeRange === 'monthly') {
+        return expDate.getMonth() === now.getMonth() && expDate.getFullYear() === now.getFullYear();
+      } else if (timeRange === 'yearly') {
+        return expDate.getFullYear() === now.getFullYear();
+      }
+      return true;
+    });
+  };
+
   const processCategoryData = (data) => {
-    const categoryTotals = data.reduce((acc, exp) => {
+    const filteredData = filterExpensesByTimeRange(data);
+    const expenseData = filteredData.filter(exp => exp.type !== 'income');
+    const categoryTotals = expenseData.reduce((acc, exp) => {
       const category = exp.category || "Other";
       acc[category] = (acc[category] || 0) + parseFloat(exp.amount || 0);
       return acc;
@@ -82,16 +107,44 @@ export default function CategoryBreakdown() {
   return (
     <div className="bg-background p-4 md:p-8 pb-12">
       <div className="relative max-w-4xl mx-auto space-y-6 mb-8">
-        <Button variant="outline" onClick={() => navigate("/analyse")}>
+        <Button variant="outline" onClick={() => navigate("/analyse")} className="cursor-pointer">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Analysis
         </Button>
 
         <Card className="bg-card border-border shadow-xl">
           <CardHeader className="bg-primary/5">
-            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Category Breakdown
-            </CardTitle>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Category Breakdown
+              </CardTitle>
+              <div className="flex gap-2">
+                <Button
+                  variant={timeRange === 'weekly' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTimeRange('weekly')}
+                  className="cursor-pointer"
+                >
+                  Weekly
+                </Button>
+                <Button
+                  variant={timeRange === 'monthly' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTimeRange('monthly')}
+                  className="cursor-pointer"
+                >
+                  Monthly
+                </Button>
+                <Button
+                  variant={timeRange === 'yearly' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTimeRange('yearly')}
+                  className="cursor-pointer"
+                >
+                  Yearly
+                </Button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="pt-6">
             {categoryData.length > 0 ? (

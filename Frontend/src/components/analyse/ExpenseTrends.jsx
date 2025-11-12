@@ -46,37 +46,40 @@ export default function ExpenseTrends() {
       const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
       for (let i = 6; i >= 0; i--) {
         const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-        const dayExpenses = data.filter((exp) => {
+        const dayTransactions = data.filter((exp) => {
           const expDate = new Date(exp.expenseDate || exp.createdAt);
           return expDate.toDateString() === date.toDateString();
         });
         processed.push({
           name: days[date.getDay()],
-          amount: dayExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0),
+          expense: dayTransactions.filter(t => t.type === 'expense').reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0),
+          income: dayTransactions.filter(t => t.type === 'income').reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0),
         });
       }
     } else if (filterType === "month") {
       for (let i = 29; i >= 0; i--) {
         const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-        const dayExpenses = data.filter((exp) => {
+        const dayTransactions = data.filter((exp) => {
           const expDate = new Date(exp.expenseDate || exp.createdAt);
           return expDate.toDateString() === date.toDateString();
         });
         processed.push({
           name: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          amount: dayExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0),
+          expense: dayTransactions.filter(t => t.type === 'expense').reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0),
+          income: dayTransactions.filter(t => t.type === 'income').reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0),
         });
       }
     } else if (filterType === "year") {
       const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       processed = months.map((month, index) => {
-        const monthExpenses = data.filter((exp) => {
+        const monthTransactions = data.filter((exp) => {
           const expDate = new Date(exp.expenseDate || exp.createdAt);
           return expDate.getMonth() === index && expDate.getFullYear() === now.getFullYear();
         });
         return {
           name: month,
-          amount: monthExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0),
+          expense: monthTransactions.filter(t => t.type === 'expense').reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0),
+          income: monthTransactions.filter(t => t.type === 'income').reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0),
         };
       });
     }
@@ -92,7 +95,7 @@ export default function ExpenseTrends() {
             <Lock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-2">Premium Feature</h2>
             <p className="text-muted-foreground mb-6">
-              Upgrade to Premium to access expense trends
+              Upgrade to Premium to access income vs expense trends and analyze your financial patterns
             </p>
             <Button onClick={() => navigate("/premium")} size="lg">
               Upgrade to Premium
@@ -106,7 +109,7 @@ export default function ExpenseTrends() {
   return (
     <div className="bg-background p-4 md:p-8 pb-12">
       <div className="relative max-w-4xl mx-auto space-y-6 mb-8">
-        <Button variant="outline" onClick={() => navigate("/analyse")}>
+        <Button variant="outline" onClick={() => navigate("/analyse")} className="cursor-pointer">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Analysis
         </Button>
@@ -114,30 +117,38 @@ export default function ExpenseTrends() {
         <Card className="bg-card border-border shadow-xl">
           <CardHeader className="bg-primary/5">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                Expense Trends
-              </CardTitle>
+              <div>
+                <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                  Income vs Expense Trends
+                </CardTitle>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Analyze income and expense patterns with weekly, monthly, and yearly charts
+                </p>
+              </div>
               <div className="flex gap-2">
                 <Button
                   variant={filter === "week" ? "default" : "outline"}
                   onClick={() => setFilter("week")}
                   size="sm"
+                  className="cursor-pointer"
                 >
-                  Week
+                  Weekly
                 </Button>
                 <Button
                   variant={filter === "month" ? "default" : "outline"}
                   onClick={() => setFilter("month")}
                   size="sm"
+                  className="cursor-pointer"
                 >
-                  Month
+                  Monthly
                 </Button>
                 <Button
                   variant={filter === "year" ? "default" : "outline"}
                   onClick={() => setFilter("year")}
                   size="sm"
+                  className="cursor-pointer"
                 >
-                  Year
+                  Yearly
                 </Button>
               </div>
             </div>
@@ -146,13 +157,14 @@ export default function ExpenseTrends() {
             {chartData.length > 0 ? (
               <div className="w-full h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData}>
+                  <BarChart data={chartData} barCategoryGap="20%">
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip formatter={(value) => `₹${value.toFixed(2)}`} />
                     <Legend />
-                    <Bar dataKey="amount" fill="#10b981" name="Expenses (₹)" />
+                    <Bar dataKey="income" fill="#10b981" name="Income (₹)" barSize={30} />
+                    <Bar dataKey="expense" fill="#ef4444" name="Expense (₹)" barSize={30} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

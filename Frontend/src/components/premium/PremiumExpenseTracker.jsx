@@ -80,9 +80,9 @@ const PremiumExpenseTracker = () => {
     }
 
     filtered.sort((a, b) => {
-      const dateA = new Date(a.expenseDate || a.createdAt);
-      const dateB = new Date(b.expenseDate || b.createdAt);
-      return dateB - dateA;
+      const dateTimeA = new Date(a.expenseDate || a.createdAt).getTime() + new Date(a.createdAt).getTime();
+      const dateTimeB = new Date(b.expenseDate || b.createdAt).getTime() + new Date(b.createdAt).getTime();
+      return dateTimeB - dateTimeA;
     });
 
     setFilteredExpenses(filtered);
@@ -149,8 +149,8 @@ const PremiumExpenseTracker = () => {
               ${filteredExpenses.map(exp => `
                 <tr>
                   <td>${new Date(exp.expenseDate || exp.createdAt).toLocaleDateString()}</td>
-                  <td class="${exp.category === 'Salary' ? 'income' : 'expense'}">
-                    ${exp.category === 'Salary' ? '+' : '-'}₹${parseFloat(exp.amount).toFixed(2)}
+                  <td class="${exp.type === 'income' ? 'income' : 'expense'}">
+                    ${exp.type === 'income' ? '+' : '-'}₹${parseFloat(exp.amount).toFixed(2)}
                   </td>
                   <td>${exp.description}</td>
                   <td>${exp.category}</td>
@@ -176,9 +176,9 @@ const PremiumExpenseTracker = () => {
   }, []);
 
   const totalAmount = filteredExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
-  const incomeExpenses = filteredExpenses.filter(exp => exp.category === "Salary");
+  const incomeExpenses = filteredExpenses.filter(exp => exp.type === "income");
   const totalIncome = incomeExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
-  const actualExpenses = filteredExpenses.filter(exp => exp.category !== "Salary");
+  const actualExpenses = filteredExpenses.filter(exp => exp.type !== "income");
   const totalExpenses = actualExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
   
   // Calculate monthly expenses for remaining budget
@@ -186,7 +186,7 @@ const PremiumExpenseTracker = () => {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthlyExpenses = expenses.filter(exp => {
     const expDate = new Date(exp.expenseDate || exp.createdAt);
-    return expDate >= monthStart && exp.category !== "Salary";
+    return expDate >= monthStart && exp.type !== "income";
   }).reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
 
   const categoryBreakdown = filteredExpenses.reduce((acc, exp) => {
@@ -373,20 +373,27 @@ const PremiumExpenseTracker = () => {
                           {new Date(exp.expenseDate || exp.createdAt).toLocaleDateString()}
                         </td>
                         <td className="py-4 px-6">
-                          <span className={`text-lg font-bold ${
-                            exp.category === "Salary" 
-                              ? "text-green-600" 
-                              : "text-red-600"
-                          }`}>
-                            {exp.category === "Salary" ? "+" : "-"}₹{parseFloat(exp.amount).toFixed(2)}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            {exp.type === 'income' ? (
+                              <TrendingUp className="w-5 h-5 text-green-600" />
+                            ) : (
+                              <TrendingDown className="w-5 h-5 text-red-600" />
+                            )}
+                            <span className={`text-lg font-bold ${
+                              exp.type === "income" 
+                                ? "text-green-600" 
+                                : "text-red-600"
+                            }`}>
+                              {exp.type === "income" ? "+" : "-"}₹{parseFloat(exp.amount).toFixed(2)}
+                            </span>
+                          </div>
                         </td>
                         <td className="py-4 px-6 font-medium">{exp.description}</td>
                         <td className="py-4 px-6">
                           <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                            exp.category === "Salary"
-                              ? "bg-green-100 text-green-800 border border-green-200"
-                              : "bg-red-100 text-red-800 border border-red-200"
+                            exp.type === "income"
+                              ? "bg-green-100 text-green-800 border border-green-200 dark:bg-green-900/30 dark:text-green-400"
+                              : "bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/30 dark:text-red-400"
                           }`}>
                             {exp.category}
                           </span>

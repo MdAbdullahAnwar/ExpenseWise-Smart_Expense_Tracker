@@ -11,7 +11,7 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
-  const [stats, setStats] = useState({ totalExpenses: 0, monthlyTotal: 0, totalCount: 0 });
+  const [stats, setStats] = useState({ totalExpenses: 0, totalIncome: 0, monthlyExpenses: 0, monthlyIncome: 0, totalCount: 0, netBalance: 0 });
   const [formData, setFormData] = useState({
     name: userInfo?.name || "",
     email: userInfo?.email || "",
@@ -34,25 +34,50 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/expense", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const [expenseRes, bankRes] = await Promise.all([
+        axios.get("http://localhost:5000/expense", {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get("http://localhost:5000/bank-account", {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
       
-      const expenses = res.data;
+      const transactions = expenseRes.data;
+      const expenses = transactions.filter(t => t.type !== 'income');
+      const incomes = transactions.filter(t => t.type === 'income');
+      
       const totalExpenses = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
+      const totalIncome = incomes.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
       
       const now = new Date();
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
       
-      const monthlyTotal = expenses
+      const monthlyExpenses = expenses
         .filter(exp => {
           const expDate = new Date(exp.expenseDate || exp.createdAt);
           return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
         })
         .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
       
-      setStats({ totalExpenses, monthlyTotal, totalCount: expenses.length });
+      const monthlyIncome = incomes
+        .filter(exp => {
+          const expDate = new Date(exp.expenseDate || exp.createdAt);
+          return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+        })
+        .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
+      
+      const netBalance = bankRes.data.accounts.reduce((sum, acc) => sum + parseFloat(acc.balance || 0), 0);
+      
+      setStats({ 
+        totalExpenses, 
+        totalIncome,
+        monthlyExpenses, 
+        monthlyIncome,
+        totalCount: transactions.length,
+        netBalance
+      });
     } catch (error) {
       console.error("Failed to fetch stats:", error);
     }
@@ -284,7 +309,7 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
               Account Statistics
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="p-6 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl border border-border hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-muted-foreground">Total Transactions</p>
@@ -298,30 +323,73 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
                 <p className="text-xs text-muted-foreground mt-1">All time</p>
               </div>
               
-              <div className="p-6 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-xl border border-border hover:shadow-lg transition-shadow">
+              <div className="p-6 bg-gradient-to-br from-red-500/10 to-red-600/10 rounded-xl border border-border hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-muted-foreground">This Month</p>
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                  <p className="text-sm font-medium text-muted-foreground">Total Expenses</p>
+                  <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center">
                     <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
                   </div>
                 </div>
-                <p className="text-3xl font-bold text-foreground">₹{stats.monthlyTotal.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground mt-1">Current month spending</p>
+                <p className="text-3xl font-bold text-red-600">₹{stats.totalExpenses.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground mt-1">Lifetime spending</p>
               </div>
               
-              <div className="p-6 bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-xl border border-border hover:shadow-lg transition-shadow">
+              <div className="p-6 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-xl border border-border hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
-                  <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+                  <p className="text-sm font-medium text-muted-foreground">Total Income</p>
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-green-600">₹{stats.totalIncome.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground mt-1">Lifetime earnings</p>
+              </div>
+              
+              <div className="p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl border border-border hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-muted-foreground">Net Balance</p>
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
                     <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                     </svg>
                   </div>
                 </div>
-                <p className="text-3xl font-bold text-foreground">₹{stats.totalExpenses.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground mt-1">Lifetime expenses</p>
+                <p className={`text-3xl font-bold ${stats.netBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  ₹{stats.netBalance.toFixed(2)}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">Total bank balance</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div className="p-6 bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-xl border border-border hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-muted-foreground">This Month Expenses</p>
+                  <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-red-600">₹{stats.monthlyExpenses.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground mt-1">Current month spending</p>
+              </div>
+              
+              <div className="p-6 bg-gradient-to-br from-teal-500/10 to-cyan-500/10 rounded-xl border border-border hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-muted-foreground">This Month Income</p>
+                  <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-green-600">₹{stats.monthlyIncome.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground mt-1">Current month earnings</p>
               </div>
             </div>
           </Card>

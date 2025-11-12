@@ -1,16 +1,68 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import PremiumPurchase from "./PremiumPurchase";
 import PremiumExpenseTracker from "./PremiumExpenseTracker";
-import { Crown } from "lucide-react";
+import { Crown, AlertCircle } from "lucide-react";
 
 const API_BASE = "http://localhost:5000";
 
 export default function PremiumPage({ userInfo, setUserInfo }) {
   const [isPremium, setIsPremium] = useState(userInfo?.isPremium || false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlRateLimitMessage = searchParams.get('rateLimitMessage');
+  const initialRemainingMinutes = parseInt(searchParams.get('remainingTime')) || 0;
+  
+  const getInitialSeconds = () => {
+    const stored = localStorage.getItem('rateLimitExpiry');
+    if (stored) {
+      const expiryTime = parseInt(stored);
+      const now = Date.now();
+      const remaining = Math.max(0, Math.floor((expiryTime - now) / 1000));
+      if (remaining > 0) return remaining;
+      localStorage.removeItem('rateLimitExpiry');
+      localStorage.removeItem('rateLimitMessage');
+    }
+    if (initialRemainingMinutes > 0) {
+      const expiryTime = Date.now() + (initialRemainingMinutes * 60 * 1000);
+      localStorage.setItem('rateLimitExpiry', expiryTime.toString());
+      if (urlRateLimitMessage) {
+        localStorage.setItem('rateLimitMessage', urlRateLimitMessage);
+      }
+      return initialRemainingMinutes * 60;
+    }
+    return 0;
+  };
+  
+  const [remainingSeconds, setRemainingSeconds] = useState(getInitialSeconds());
+  const rateLimitMessage = urlRateLimitMessage || localStorage.getItem('rateLimitMessage') || '';
 
   useEffect(() => {
     setIsPremium(userInfo?.isPremium || false);
   }, [userInfo]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('rateLimitExpiry');
+    if (stored) {
+      const interval = setInterval(() => {
+        const expiryTime = parseInt(stored);
+        const now = Date.now();
+        const remaining = Math.max(0, Math.floor((expiryTime - now) / 1000));
+        
+        if (remaining <= 0) {
+          clearInterval(interval);
+          localStorage.removeItem('rateLimitExpiry');
+          localStorage.removeItem('rateLimitMessage');
+          setRemainingSeconds(0);
+        } else {
+          setRemainingSeconds(remaining);
+        }
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, []);
+
+  const minutes = Math.floor(remainingSeconds / 60);
+  const seconds = remainingSeconds % 60;
 
   if (!userInfo) {
     return (
@@ -38,6 +90,27 @@ export default function PremiumPage({ userInfo, setUserInfo }) {
       </div>
       
       <div className="relative max-w-4xl mx-auto px-4">
+        {rateLimitMessage && (
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-500 rounded-xl animate-fade-in">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-red-900 dark:text-red-100 mb-1">
+                  Transaction Limit Reached
+                </h3>
+                <p className="text-red-800 dark:text-red-200">
+                  {rateLimitMessage}
+                </p>
+                {remainingSeconds > 0 && (
+                  <p className="text-sm text-red-700 dark:text-red-300 mt-2 font-mono">
+                    Time remaining: {minutes.toString().padStart(2, '0')} min {seconds.toString().padStart(2, '0')} sec
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className="text-center mb-12 animate-fade-in">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-professional-lg">
             <Crown className="w-10 h-10 text-white" />

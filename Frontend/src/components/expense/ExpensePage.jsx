@@ -18,16 +18,21 @@ export default function ExpensePage() {
     customCategory: "",
     note: "",
     expenseDate: new Date().toISOString().split('T')[0],
+    BankAccountId: "",
+    type: "expense",
+    isRecurring: false,
+    recurringDay: 1,
   });
   const [toast, setToast] = useState(null);
   const [expenses, setExpenses] = useState([]);
+  const [bankAccounts, setBankAccounts] = useState([]);
   const [isEditingBudget, setIsEditingBudget] = useState(false);
   const [budgetInput, setBudgetInput] = useState(0);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const monthlyBudget = useSelector((state) => state.user.monthlyBudget);
 
-  const categories = [
+  const expenseCategories = [
     "Food",
     "Transport",
     "Shopping",
@@ -36,16 +41,44 @@ export default function ExpensePage() {
     "Entertainment",
     "Health",
     "Education",
-    "Salary",
     "Other",
   ];
+
+  const incomeCategories = [
+    "Salary",
+    "Freelance",
+    "Business",
+    "Investment",
+    "Gift",
+    "Bonus",
+    "Refund",
+    "Other",
+  ];
+
+  const categories = form.type === 'income' ? incomeCategories : expenseCategories;
 
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     fetchExpenses();
+    fetchBankAccounts();
     setBudgetInput(monthlyBudget || 0);
   }, [monthlyBudget]);
+
+  const fetchBankAccounts = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/bank-account", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setBankAccounts(res.data.accounts);
+      const defaultAccount = res.data.accounts.find(acc => acc.isDefault);
+      if (defaultAccount) {
+        setForm(prev => ({ ...prev, BankAccountId: defaultAccount.id }));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchExpenses = async () => {
     try {
@@ -65,7 +98,7 @@ export default function ExpensePage() {
   const totalAmount = expenses
     .filter(exp => {
       const expDate = new Date(exp.expenseDate || exp.createdAt);
-      return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+      return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear && exp.type !== 'income';
     })
     .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
   
@@ -138,10 +171,15 @@ export default function ExpensePage() {
           category: finalCategory,
           note: form.note,
           expenseDate: form.expenseDate,
+          BankAccountId: form.BankAccountId || null,
+          type: form.type,
+          isRecurring: form.isRecurring,
+          recurringDay: form.isRecurring ? form.recurringDay : null,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
+      const defaultAccount = bankAccounts.find(acc => acc.isDefault);
       setForm({
         amount: "",
         description: "",
@@ -149,16 +187,27 @@ export default function ExpensePage() {
         customCategory: "",
         note: "",
         expenseDate: new Date().toISOString().split('T')[0],
+        BankAccountId: defaultAccount?.id || "",
+        type: "expense",
+        isRecurring: false,
+        recurringDay: 1,
       });
-      setToast({ message: "Expense added successfully!", type: "success" });
+      setToast({ message: `${form.type === 'income' ? 'Income' : 'Expense'} added successfully!`, type: "success" });
       await fetchExpenses();
     } catch (err) {
       console.error(err);
       setExpenses(previousExpenses);
-      setToast({
-        message: err.response?.data?.message || "Transaction failed. Please try again.",
-        type: "error",
-      });
+      
+      if (err.response?.status === 429) {
+        const message = err.response?.data?.message || "Rate limit exceeded";
+        const remainingTime = err.response?.data?.remainingTime || 0;
+        navigate(`/premium?rateLimitMessage=${encodeURIComponent(message)}&remainingTime=${remainingTime}`);
+      } else {
+        setToast({
+          message: err.response?.data?.message || "Transaction failed. Please try again.",
+          type: "error",
+        });
+      }
     }
   };
 
@@ -169,7 +218,7 @@ export default function ExpensePage() {
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 rounded-full blur-3xl"></div>
       </div>
       
-      <div className="relative max-w-2xl mx-auto space-y-6 mb-8">
+      <div className="relative max-w-2xl mx-auto space-y-4 sm:space-y-6 mb-8">
         <Card className="bg-card animate-fade-in border-border shadow-xl">
           <CardContent className="pt-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
@@ -260,16 +309,43 @@ export default function ExpensePage() {
 
         <Card className="bg-card animate-scale-in border-border shadow-xl">
           <CardHeader className="text-center bg-primary/5">
-            <CardTitle className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
-              Add New Expense
+            <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+              Add New Transaction
             </CardTitle>
-            <CardDescription className="text-base">
-              Track your spending with detailed categorization
+            <CardDescription className="text-sm sm:text-base">
+              Track your expenses and income
             </CardDescription>
           </CardHeader>
 
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent className="px-4 sm:px-6">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              <div className="space-y-2">
+                <Label>Transaction Type</Label>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, type: 'expense' })}
+                    className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all cursor-pointer ${
+                      form.type === 'expense'
+                        ? 'bg-red-500 text-white shadow-lg'
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                  >
+                    Expense
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, type: 'income' })}
+                    className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all cursor-pointer ${
+                      form.type === 'income'
+                        ? 'bg-green-500 text-white shadow-lg'
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                  >
+                    Income
+                  </button>
+                </div>
+              </div>
               <div className="space-y-2">
                 <Label>Amount</Label>
                 <div className="relative">
@@ -339,6 +415,26 @@ export default function ExpensePage() {
                 />
               </div>
 
+              {bankAccounts.length > 0 && (
+                <div className="space-y-2">
+                  <Label>Bank Account</Label>
+                  <select
+                    name="BankAccountId"
+                    value={form.BankAccountId}
+                    onChange={handleChange}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <option value="">Select account (optional)</option>
+                    {bankAccounts.map((acc) => (
+                      <option key={acc.id} value={acc.id}>
+                        {acc.name} - ₹{parseFloat(acc.balance).toFixed(2)}
+                        {acc.isDefault ? " (Default)" : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label>Note (Optional)</Label>
                 <Input
@@ -349,7 +445,49 @@ export default function ExpensePage() {
                 />
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 pt-6">
+              <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/50">
+                <div className="space-y-0.5">
+                  <Label htmlFor="isRecurring" className="text-base font-medium cursor-pointer">
+                    Recurring Transaction
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Auto-add this {form.type} monthly
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={form.isRecurring}
+                  onClick={() => setForm({ ...form, isRecurring: !form.isRecurring })}
+                  className={`cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                    form.isRecurring ? 'bg-blue-600' : 'bg-muted'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform ${
+                      form.isRecurring ? 'translate-x-6' : 'translate-x-0.5'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {form.isRecurring && (
+                <div className="space-y-2 p-4 rounded-lg border border-border bg-accent/50 animate-fade-in">
+                  <Label className="text-sm font-semibold">Repeat on Day of Month</Label>
+                  <Input
+                    type="number"
+                    value={form.recurringDay}
+                    onChange={(e) => setForm({ ...form, recurringDay: parseInt(e.target.value) || 1 })}
+                    min="1"
+                    max="28"
+                    placeholder="1"
+                    className="h-11"
+                  />
+                  <p className="text-xs text-muted-foreground font-medium">Day 1-28 of each month</p>
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6">
                 <Button
                   type="submit"
                   size="lg"
@@ -358,7 +496,7 @@ export default function ExpensePage() {
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
-                  Add Expense
+                  Add {form.type === 'income' ? 'Income' : 'Expense'}
                 </Button>
                 <Button
                   type="button"
@@ -370,7 +508,7 @@ export default function ExpensePage() {
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
-                  View All Expenses
+                  View All Transactions
                 </Button>
               </div>
             </form>

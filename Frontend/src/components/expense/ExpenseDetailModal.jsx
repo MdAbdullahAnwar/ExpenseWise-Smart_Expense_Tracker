@@ -1,4 +1,4 @@
-import { X, Calendar, DollarSign, Tag, FileText } from 'lucide-react';
+import { X, Calendar, DollarSign, Tag, FileText, Wallet, TrendingUp, TrendingDown } from 'lucide-react';
 
 export default function ExpenseDetailModal({ expense, onClose }) {
   if (!expense) return null;
@@ -24,15 +24,25 @@ export default function ExpenseDetailModal({ expense, onClose }) {
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
           
           {/* Amount Card */}
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-6 border-2 border-green-200 dark:border-green-800">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-green-500 rounded-lg">
-                <DollarSign className="w-5 h-5 text-white" />
+          <div className={`bg-gradient-to-br ${expense.type === 'income' ? 'from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20' : 'from-red-50 to-red-50 dark:from-red-900/20 dark:to-red-900/20'} rounded-xl p-6 border-2 ${expense.type === 'income' ? 'border-green-200 dark:border-green-800' : 'border-red-200 dark:border-red-800'}`}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 ${expense.type === 'income' ? 'bg-green-500' : 'bg-red-500'} rounded-lg`}>
+                  <DollarSign className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Amount</span>
               </div>
-              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Amount</span>
+              {expense.type === 'income' ? (
+                <TrendingUp className="w-6 h-6 text-green-600" />
+              ) : (
+                <TrendingDown className="w-6 h-6 text-red-600" />
+              )}
             </div>
-            <p className="text-3xl md:text-4xl font-bold text-green-600 dark:text-green-400">
-              ₹{parseFloat(expense.amount).toFixed(2)}
+            <p className={`text-3xl md:text-4xl font-bold ${expense.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              {expense.type === 'income' ? '+' : '-'}₹{parseFloat(expense.amount).toFixed(2)}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 font-semibold uppercase">
+              {expense.type === 'income' ? 'Income' : 'Expense'}
             </p>
           </div>
 
@@ -89,6 +99,21 @@ export default function ExpenseDetailModal({ expense, onClose }) {
                   year: 'numeric'
                 })}
               </p>
+            </div>
+
+            {/* Bank Account */}
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600 md:col-span-2">
+              <div className="flex items-center gap-2 mb-2">
+                <Wallet className="w-4 h-4 text-indigo-500" />
+                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Bank Account</span>
+              </div>
+              {expense.BankAccount ? (
+                <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-bold bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                  {expense.BankAccount.name}
+                </span>
+              ) : (
+                <p className="text-base font-semibold text-gray-500 dark:text-gray-400 italic">No bank account linked</p>
+              )}
             </div>
           </div>
 

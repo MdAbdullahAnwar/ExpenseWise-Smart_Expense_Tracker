@@ -9,7 +9,8 @@ exports.getLeaderboard = async (req, res) => {
       return res.status(403).json({ message: "Premium feature only" });
     }
 
-    const leaderboard = await leaderboardService.getLeaderboard(req.userId);
+    const { type = 'expense', timeRange = 'all' } = req.query;
+    const leaderboard = await leaderboardService.getLeaderboard(req.userId, type, timeRange);
     res.status(200).json(leaderboard);
   } catch (err) {
     console.error("Leaderboard error:", err);
