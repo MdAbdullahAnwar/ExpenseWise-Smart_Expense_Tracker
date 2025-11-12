@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Pagination } from "../ui/Pagination";
 import { usePagination } from "../../hooks/usePagination";
-import { ArrowLeft, Lock, Trophy, Medal, Award, TrendingUp, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Crown } from "lucide-react";
+import { ArrowLeft, Lock, Trophy, Medal, Award, TrendingUp, TrendingDown, Crown } from "lucide-react";
 import Toast from "../ui/toast";
 
 export default function Leaderboard() {
@@ -15,6 +15,7 @@ export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
+  const [timeRange, setTimeRange] = useState('all');
   
   const pagination = usePagination(leaderboard, 5, 'leaderboard-per-page');
 
@@ -22,13 +23,13 @@ export default function Leaderboard() {
     if (isPremium) {
       fetchLeaderboard();
     }
-  }, [isPremium]);
+  }, [isPremium, timeRange]);
 
   const fetchLeaderboard = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/leaderboard", {
+      const res = await axios.get(`http://localhost:5000/leaderboard?type=expense&timeRange=${timeRange}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLeaderboard(res.data);
@@ -86,9 +87,45 @@ export default function Leaderboard() {
           Back to Analysis
         </Button>
 
-        {leaderboard.length > 0 && (
-          <Card className="bg-card border-border">
-            <CardContent className="pt-6">
+        <Card className="bg-card border-border">
+          <CardContent className="pt-6">
+            <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex gap-2">
+                <Button
+                  variant={timeRange === 'all' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTimeRange('all')}
+                  className="cursor-pointer"
+                >
+                  All Time
+                </Button>
+                <Button
+                  variant={timeRange === 'weekly' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTimeRange('weekly')}
+                  className="cursor-pointer"
+                >
+                  Weekly
+                </Button>
+                <Button
+                  variant={timeRange === 'monthly' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTimeRange('monthly')}
+                  className="cursor-pointer"
+                >
+                  Monthly
+                </Button>
+                <Button
+                  variant={timeRange === 'yearly' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTimeRange('yearly')}
+                  className="cursor-pointer"
+                >
+                  Yearly
+                </Button>
+              </div>
+            </div>
+            {leaderboard.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-primary/5 rounded-lg">
                   <p className="text-sm text-muted-foreground mb-1">Total Users</p>
@@ -102,33 +139,33 @@ export default function Leaderboard() {
                 </div>
                 <div className="text-center p-4 bg-primary/5 rounded-lg">
                   <p className="text-sm text-muted-foreground mb-1">Your Expenses</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    ₹{leaderboard.find(u => u.isCurrentUser)?.totalExpenses || "0.00"}
+                  <p className="text-2xl font-bold text-red-600">
+                    ₹{leaderboard.find(u => u.isCurrentUser)?.totalAmount || "0.00"}
                   </p>
                 </div>
                 <div className="text-center p-4 bg-primary/5 rounded-lg">
                   <p className="text-sm text-muted-foreground mb-1">Top Spender</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    ₹{leaderboard[0]?.totalExpenses || "0.00"}
+                  <p className="text-2xl font-bold text-red-600">
+                    ₹{leaderboard[0]?.totalAmount || "0.00"}
                   </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        )}
+            )}
+          </CardContent>
+        </Card>
 
         <Card className="bg-card border-border shadow-xl">
           <CardHeader className="bg-primary/5">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-xl shadow-lg">
-                <Trophy className="w-6 h-6 text-white" />
+              <div className="p-2 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg">
+                <TrendingDown className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-3xl font-bold bg-gradient-to-r from-yellow-600 via-amber-600 to-orange-600 bg-clip-text text-transparent">
-                  User Leaderboard
+                <CardTitle className="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                  Expense Leaderboard
                 </CardTitle>
                 <p className="text-sm text-muted-foreground mt-1">
-                  See how you rank among all users and compete for the top spot
+                  See how you rank among all users in spending
                 </p>
               </div>
             </div>
@@ -181,11 +218,11 @@ export default function Leaderboard() {
                       </div>
 
                       <div className="text-right flex-shrink-0">
-                        <p className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                          ₹{user.totalExpenses}
+                        <p className="text-xl font-bold text-red-600">
+                          ₹{user.totalAmount}
                         </p>
                         <p className="text-xs text-muted-foreground flex items-center justify-end gap-1">
-                          <TrendingUp className="w-3 h-3" />
+                          <TrendingDown className="w-3 h-3" />
                           {user.totalTransactions} transactions
                         </p>
                       </div>

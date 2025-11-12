@@ -1,6 +1,5 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const User = require("./user");
 
 const Expense = sequelize.define("Expense", {
   amount: {
@@ -23,9 +22,24 @@ const Expense = sequelize.define("Expense", {
     type: DataTypes.DATEONLY,
     allowNull: false,
   },
+  type: {
+    type: DataTypes.ENUM('expense', 'income'),
+    allowNull: false,
+    defaultValue: 'expense',
+  },
+  isRecurring: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
+  recurringDay: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    validate: {
+      min: 1,
+      max: 28,
+    },
+  },
 });
-
-Expense.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
-User.hasMany(Expense);
 
 module.exports = Expense;

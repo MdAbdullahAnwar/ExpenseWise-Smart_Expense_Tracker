@@ -135,7 +135,7 @@ const DashboardPreview = () => {
   const totalAmount = expenses
     .filter(exp => {
       const expDate = new Date(exp.expenseDate || exp.createdAt);
-      return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+      return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear && exp.type !== 'income';
     })
     .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
   const transactionCount = expenses.length;

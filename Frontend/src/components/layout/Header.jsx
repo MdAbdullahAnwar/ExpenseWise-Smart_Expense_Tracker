@@ -60,6 +60,7 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
     { path: "/", label: "Home", icon: Home },
     { path: "/expenses", label: "Add Expense", icon: PlusCircle },
     { path: "/expense-list", label: "Expense List", icon: List },
+    { path: "/bank-accounts", label: "Bank Accounts", icon: Wallet },
     ...(isPremium ? [{ path: "/analyse", label: "Analyse Expenses", icon: BarChart3 }] : []),
   ];
 
@@ -84,21 +85,21 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
           </Link>
 
           {isAuthenticated ? (
-            <nav className="hidden lg:flex items-center space-x-1">
+            <nav className="hidden lg:flex items-center gap-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                    className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg font-medium text-sm transition-all duration-200 whitespace-nowrap ${
                       isActive(item.path)
                         ? "bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 text-blue-600 dark:text-blue-400"
                         : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     }`}
                   >
                     <Icon className="w-4 h-4" />
-                    {item.label}
+                    <span className="hidden xl:inline">{item.label}</span>
                   </Link>
                 );
               })}
@@ -106,7 +107,7 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
               {isPremium && (
                 <button
                   onClick={toggleTheme}
-                  className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-200 cursor-pointer"
+                  className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-200 cursor-pointer ml-1"
                   aria-label="Toggle theme"
                 >
                   {theme === "light" ? (
@@ -119,22 +120,22 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
 
               {/* Premium Button - shows status */}
               {userInfo?.isPremium ? (
-                <Link to="/premium" className="ml-2 cursor-pointer">
-                  <Button className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg cursor-pointer">
+                <Link to="/premium" className="ml-1 cursor-pointer">
+                  <Button className="flex items-center gap-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg cursor-pointer px-3 py-2 h-9">
                     <Crown className="w-4 h-4" />
-                    <span>Premium Member</span>
+                    <span className="hidden xl:inline">Premium</span>
                   </Button>
                 </Link>
               ) : (
-                <Link to="/premium" className="ml-2 cursor-pointer">
-                  <Button className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 cursor-pointer">
+                <Link to="/premium" className="ml-1 cursor-pointer">
+                  <Button className="flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 cursor-pointer px-3 py-2 h-9">
                     <Crown className="w-4 h-4" />
-                    <span>Go Premium</span>
+                    <span className="hidden xl:inline">Go Premium</span>
                   </Button>
                 </Link>
               )}
 
-              <div ref={dropdownRef} className="relative ml-4 pl-4 border-l border-gray-200 dark:border-gray-700">
+              <div ref={dropdownRef} className="relative ml-2 pl-2 border-l border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer"
@@ -244,7 +245,6 @@ export default function Header({ isAuthenticated, userInfo, setUserInfo, onLogou
                   </button>
                 )}
 
-                {/* Mobile Premium Button - shows status */}
                 {userInfo?.isPremium ? (
                   <Link
                     to="/premium"

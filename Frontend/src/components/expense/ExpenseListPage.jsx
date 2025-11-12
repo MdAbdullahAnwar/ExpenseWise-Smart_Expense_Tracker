@@ -13,7 +13,7 @@ import { Pagination } from "../ui/Pagination";
 import { usePagination } from "../../hooks/usePagination";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Download, Lock, Edit2, Save, X, Trash2, Target, Search, Eye } from "lucide-react";
+import { Download, Lock, Edit2, Save, X, Trash2, Target, Search, Eye, TrendingDown, TrendingUp } from "lucide-react";
 import Toast from "../ui/toast";
 import ExpenseDetailModal from "./ExpenseDetailModal";
 
@@ -96,6 +96,7 @@ export default function ExpenseListPage() {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [selectedExpense, setSelectedExpense] = useState(null);
+  const [bankAccounts, setBankAccounts] = useState([]);
   const navigate = useNavigate();
   const isPremium = useSelector((state) => state.user.isPremium);
 
@@ -121,10 +122,11 @@ export default function ExpenseListPage() {
       const res = await axios.get("http://localhost:5000/expense", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log('Fetched expenses:', res.data);
       const sorted = res.data.sort((a, b) => {
-        const dateA = new Date(a.expenseDate || a.createdAt);
-        const dateB = new Date(b.expenseDate || b.createdAt);
-        return dateB - dateA;
+        const dateTimeA = new Date(a.expenseDate || a.createdAt).getTime() + new Date(a.createdAt).getTime();
+        const dateTimeB = new Date(b.expenseDate || b.createdAt).getTime() + new Date(b.createdAt).getTime();
+        return dateTimeB - dateTimeA;
       });
       setExpenses(sorted);
       setFilteredExpenses(sorted);
@@ -137,10 +139,22 @@ export default function ExpenseListPage() {
     }
   };
 
+  const fetchBankAccounts = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/bank-account", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log('Bank accounts:', res.data.accounts);
+      setBankAccounts(res.data.accounts);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleSearch = (term) => {
     setSearchTerm(term);
     if (!term.trim()) {
-      setFilteredExpenses(expenses);
+      setFilteredExpenses([...expenses]);
     } else {
       const filtered = expenses.filter(exp => 
         exp.description.toLowerCase().includes(term.toLowerCase()) ||
@@ -187,6 +201,8 @@ export default function ExpenseListPage() {
       category: exp.category,
       note: exp.note || "",
       expenseDate: exp.expenseDate || new Date(exp.createdAt).toISOString().split('T')[0],
+      BankAccountId: exp.BankAccountId || "",
+      type: exp.type || "expense",
     });
   };
 
@@ -202,17 +218,28 @@ export default function ExpenseListPage() {
     }
 
     const previousExpenses = [...expenses];
-    const optimisticExpenses = expenses.map((exp) =>
-      exp.id === id ? { ...exp, ...editForm } : exp
-    );
-    setExpenses(optimisticExpenses);
-    handleSearch(searchTerm);
+    console.log('editForm.BankAccountId:', editForm.BankAccountId, 'type:', typeof editForm.BankAccountId);
+    const bankAccountId = editForm.BankAccountId && editForm.BankAccountId !== "" ? parseInt(editForm.BankAccountId) : null;
+    const dataToSend = {
+      amount: editForm.amount,
+      description: editForm.description,
+      category: editForm.category,
+      note: editForm.note,
+      expenseDate: editForm.expenseDate,
+      BankAccountId: bankAccountId,
+      type: editForm.type || "expense"
+    };
+    console.log('Sending update:', dataToSend);
+    console.log('BankAccountId in dataToSend:', dataToSend.BankAccountId);
+    console.log('JSON.stringify(dataToSend):', JSON.stringify(dataToSend));
 
     try {
-      await axios.put(`http://localhost:5000/expense/${id}`, editForm, {
+      const response = await axios.put(`http://localhost:5000/expense/${id}`, dataToSend, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+      console.log('Update response:', response.data);
+      
+      await new Promise(resolve => setTimeout(resolve, 100));
       await fetchExpenses();
       setEditingId(null);
       setEditForm({});
@@ -231,6 +258,7 @@ export default function ExpenseListPage() {
 
   useEffect(() => {
     fetchExpenses();
+    fetchBankAccounts();
   }, []);
 
   const downloadCSV = () => {
@@ -272,7 +300,7 @@ export default function ExpenseListPage() {
   const totalAmount = expenses
     .filter(exp => {
       const expDate = new Date(exp.expenseDate || exp.createdAt);
-      return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+      return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear && exp.type !== 'income';
     })
     .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
   const categoryTotals = expenses.reduce((acc, exp) => {
@@ -287,10 +315,10 @@ export default function ExpenseListPage() {
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative max-w-6xl mx-auto space-y-6">
+      <div className="relative max-w-6xl mx-auto space-y-4 sm:space-y-6">
         <Card className="bg-card animate-fade-in border-border shadow-xl">
           <CardHeader className="bg-primary/5">
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
@@ -308,15 +336,15 @@ export default function ExpenseListPage() {
                       />
                     </svg>
                   </div>
-                  <CardTitle className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                     Expense Dashboard
                   </CardTitle>
                 </div>
-                <CardDescription className="text-base ml-14">
+                <CardDescription className="text-sm sm:text-base ml-14">
                   Track and manage all your expenses in one place
                 </CardDescription>
               </div>
-              <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                 <Button
                   onClick={downloadCSV}
                   variant="outline"
@@ -354,7 +382,7 @@ export default function ExpenseListPage() {
         </Card>
 
         {expenses.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 animate-fade-in">
             <Card className="relative overflow-hidden group hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-card border-border">
               <div className="absolute inset-0 bg-green-500/5 group-hover:bg-green-500/10 transition-all"></div>
               <CardContent className="pt-6 relative">
@@ -442,7 +470,7 @@ export default function ExpenseListPage() {
 
         {/* Search Bar */}
         {expenses.length > 0 && (
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <div className="relative">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
                 <Search className="w-4 h-4 text-white" />
@@ -479,19 +507,22 @@ export default function ExpenseListPage() {
         <Card className="bg-card animate-fade-in border-border shadow-xl">
           {filteredExpenses.length > 0 ? (
             <div className="overflow-hidden">
-              <div className="bg-primary/5 px-6 py-4 border-b border-border">
-                <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <div className="bg-primary/5 px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b border-border">
+                <h3 className="text-base sm:text-lg md:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   Recent Transactions
                 </h3>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full table-fixed">
+                <table className="w-full min-w-[900px]">
                   <thead>
                     <tr className="bg-muted border-b-2 border-border">
-                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[120px]">
+                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[100px]">
                         Date
                       </th>
-                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[150px]">
+                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[80px]">
+                        Type
+                      </th>
+                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[140px]">
                         Amount
                       </th>
                       <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[180px]">
@@ -502,6 +533,9 @@ export default function ExpenseListPage() {
                       </th>
                       <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[150px]">
                         Note
+                      </th>
+                      <th className="text-left py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[140px]">
+                        Bank Account
                       </th>
                       <th className="text-center py-4 px-6 font-bold text-foreground uppercase text-xs tracking-wider w-[180px]">
                         Actions
@@ -520,6 +554,13 @@ export default function ExpenseListPage() {
                           </span>
                         </td>
                         <td className="py-5 px-6">
+                          {exp.type === 'income' ? (
+                            <TrendingUp className="w-5 h-5 text-green-600" />
+                          ) : (
+                            <TrendingDown className="w-5 h-5 text-red-600" />
+                          )}
+                        </td>
+                        <td className="py-5 px-6">
                           {editingId === exp.id ? (
                             <Input
                               type="number"
@@ -536,7 +577,7 @@ export default function ExpenseListPage() {
                             />
                           ) : (
                             <div className="flex items-center gap-2">
-                              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-md">
+                              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${exp.type === 'income' ? 'from-green-500 to-emerald-600' : 'from-red-500 to-red-600'} flex items-center justify-center shadow-md`}>
                                 <svg
                                   className="w-5 h-5 text-white"
                                   fill="none"
@@ -551,8 +592,8 @@ export default function ExpenseListPage() {
                                   />
                                 </svg>
                               </div>
-                              <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                                ₹{parseFloat(exp.amount).toFixed(2)}
+                              <span className={`text-xl font-bold bg-gradient-to-r ${exp.type === 'income' ? 'from-green-600 to-emerald-600' : 'from-red-600 to-red-600'} bg-clip-text text-transparent`}>
+                                {exp.type === 'income' ? '+' : '-'}₹{parseFloat(exp.amount) % 1 === 0 ? parseFloat(exp.amount).toFixed(0) : parseFloat(exp.amount).toFixed(2)}
                               </span>
                             </div>
                           )}
@@ -619,6 +660,33 @@ export default function ExpenseListPage() {
                           )}
                         </td>
                         <td className="py-5 px-6">
+                          {editingId === exp.id ? (
+                            <select
+                              value={editForm.BankAccountId || ""}
+                              onChange={(e) =>
+                                setEditForm({
+                                  ...editForm,
+                                  BankAccountId: e.target.value,
+                                })
+                              }
+                              className="px-3 py-2 border rounded-lg bg-background border-input text-foreground text-sm"
+                            >
+                              <option value="">None</option>
+                              {bankAccounts.map((acc) => (
+                                <option key={acc.id} value={acc.id}>
+                                  {acc.name}
+                                </option>
+                              ))}
+                            </select>
+                          ) : exp.BankAccount ? (
+                            <span className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                              {exp.BankAccount.name}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-muted-foreground italic">-</span>
+                          )}
+                        </td>
+                        <td className="py-5 px-6">
                           <div className="flex items-center justify-center gap-2">
                             {editingId === exp.id ? (
                               <>
@@ -681,7 +749,7 @@ export default function ExpenseListPage() {
               </div>
             </div>
           ) : (
-            <div className="text-center py-20">
+            <div className="text-center py-12 sm:py-20 px-4">
               <div className="inline-flex items-center justify-center w-24 h-24 bg-primary/10 rounded-3xl mb-6 shadow-xl">
                 <svg
                   className="w-12 h-12 text-primary"
@@ -697,10 +765,10 @@ export default function ExpenseListPage() {
                   />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
+              <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
                 No expenses recorded yet
               </h3>
-              <p className="text-muted-foreground mb-8 text-lg">
+              <p className="text-muted-foreground mb-6 sm:mb-8 text-base sm:text-lg">
                 Start tracking your expenses by adding your first transaction
               </p>
               <Button

@@ -22,6 +22,7 @@ import AnalysePage from "./components/analyse/AnalysePage";
 import CategoryBreakdown from "./components/analyse/CategoryBreakdown";
 import ExpenseTrends from "./components/analyse/ExpenseTrends";
 import Leaderboard from "./components/analyse/Leaderboard";
+import BankAccountPage from "./components/bankAccount/BankAccountPage";
 
 function AppContent() {
   const dispatch = useDispatch();
@@ -166,6 +167,16 @@ function AppContent() {
             element={
               userId ? (
                 <Leaderboard />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="bank-accounts"
+            element={
+              userId ? (
+                <BankAccountPage />
               ) : (
                 <Navigate to="/login" />
               )
