@@ -18,7 +18,7 @@ exports.arcjetProtection = async (req, res, next) => {
       rules: [
         detectBot({
           mode: "LIVE",
-          block: ["AUTOMATED"]
+          deny: ["AUTOMATED"]
         }),
         tokenBucket({
           mode: "LIVE",

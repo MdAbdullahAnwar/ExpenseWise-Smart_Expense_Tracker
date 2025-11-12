@@ -3,10 +3,6 @@ const expenseService = require("../services/expenseService");
 exports.addExpense = async (req, res) => {
   try {
     const { amount, description, category, note, expenseDate, BankAccountId, type, isRecurring, recurringDay } = req.body;
-
-    if (!amount || !description || !category)
-      return res.status(400).json({ message: "All fields are required" });
-
     const expense = await expenseService.addExpense(req.userId, { amount, description, category, note, expenseDate, BankAccountId, type, isRecurring, recurringDay });
     res.status(201).json(expense);
   } catch (err) {
