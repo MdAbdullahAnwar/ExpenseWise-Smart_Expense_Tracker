@@ -54,58 +54,57 @@ A full-stack expense tracking application built with React, Node.js, Express, an
 - 🎯 **Budget Alerts** - Visual warnings when approaching budget limits
 
 ## 📸 Screenshots
-
 ### Landing Page - Hero Section
-![Landing Page Hero](screenshots/LandingPage.png)
-*Beautiful hero section with call-to-action and feature highlights*
+![Landing Page Hero](screenshots/LandingPage.png)  
+Beautiful hero section with call-to-action and feature highlights
 
 ### Landing Page - Features
-![Landing Page Features](screenshots/LandingPage2.png)
-*Comprehensive feature showcase with icons and descriptions*
+![Landing Page Features](screenshots/LandingPage2.png)  
+Comprehensive feature showcase with icons and descriptions
 
 ### Landing Page - Pricing
-![Landing Page Features](screenshots/LandingPage3.png)
-*Transparent pricing plans with feature comparison*
+![Landing Page Pricing](screenshots/LandingPage3.png)  
+Transparent pricing plans with feature comparison
 
 ### Add Expense
-![Add Expense](screenshots/AddExpensePage.png)
-*Simple and intuitive expense entry form with budget indicator*
+![Add Expense](screenshots/AddExpensePage.png)  
+Simple and intuitive expense entry form with budget indicator
 
 ### Expense List
-![Expense List](screenshots/ExpenseListPage.png)
-*View all expenses with search, filter, and pagination*
+![Expense List](screenshots/ExpenseListPage.png)  
+View all expenses with search, filter, and pagination
 
 ### Premium Features
-![Premium](screenshots/PremiumPage.png)
-*Premium membership page with Razorpay integration*
+![Premium](screenshots/PremiumPage.png)  
+Premium membership page with Razorpay integration
 
 ### Profile Page
-![Profile](screenshots/ProfilePage.png)
-*User profile with statistics and photo upload*
+![Profile](screenshots/ProfilePage.png)  
+User profile with statistics and photo upload
 
 ### Unlocked Premium Features
-![Unlocked Premium](screenshots/PremiumUnlockedPage.png)
-*Premium membership page unlocked with Transaction breakdown days, weekly and monthly spending with pagination and Expense Report PDF Export*
+![Unlocked Premium](screenshots/PremiumUnlockedPage.png)  
+Premium membership page unlocked with Transaction breakdown days, weekly and monthly spending with pagination and Expense Report PDF Export
 
 ### Expense Analysis
-![Expense Analysis](screenshots/AnalyseExpense.png)
-*Comprehensive expense Category Breakdown, Expense Trends and Leaderboard comes in Premium membership*
+![Expense Analysis](screenshots/AnalyseExpense.png)  
+Comprehensive expense Category Breakdown, Expense Trends and Leaderboard comes in Premium membership
 
 ### Category Breakdown
-![Category Breakdown](screenshots/CategoryBreakdown.png)
-*Pie chart showing expense distribution by category*
+![Category Breakdown](screenshots/CategoryBreakdown.png)  
+Pie chart showing expense distribution by category
 
 ### Expense Trends
-![Expense Trends](screenshots/ExpenseTrends.png)
-*Visual analytics with charts and spending trends daily, weekly and monthly*
+![Expense Trends](screenshots/ExpenseTrends.png)  
+Visual analytics with charts and spending trends daily, weekly and monthly
 
 ### User Leaderboard
-![User Leaderboard](screenshots/Leaderboard.png)
-*Top spenders list - See how you rank among all users and compete for the top spot*
+![User Leaderboard](screenshots/Leaderboard.png)  
+Top spenders list - See how you rank among all users and compete for the top spot
 
 ### Dark Mode
-![Dark Mode](screenshots/DarkLightFeature.png)
-*Beautiful dark theme for comfortable viewing*
+![Dark Mode](screenshots/DarkLightFeature.png)  
+Beautiful dark theme for comfortable viewing
 
 ## 🛠 Tech Stack
 
@@ -411,8 +410,6 @@ Reset password with token
   - AI-generated financial insights (3 actionable tips)
 - **Powered by:** Llama 3.2 via OpenRouter
 - **Delivered via:** Brevo email service
-
-For detailed AI setup instructions, see [GEMINI_SETUP.md](GEMINI_SETUP.md)
 
 ## 🏦 Bank Account Features
 
