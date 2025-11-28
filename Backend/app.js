@@ -48,7 +48,7 @@ app.get("/", (req, res) => {
 });
 
 sequelize
-  .sync({ alter: false })
+  .sync({ alter: process.env.NODE_ENV === 'production' })
   .then(() => {
     console.log("Database synced");
     console.log("Run 'node scripts/migrateUserTotals.js' to populate existing user totals");
