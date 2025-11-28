@@ -4,7 +4,7 @@ import PremiumPurchase from "./PremiumPurchase";
 import PremiumExpenseTracker from "./PremiumExpenseTracker";
 import { Crown, AlertCircle } from "lucide-react";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function PremiumPage({ userInfo, setUserInfo }) {
   const [isPremium, setIsPremium] = useState(userInfo?.isPremium || false);

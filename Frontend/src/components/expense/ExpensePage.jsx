@@ -68,7 +68,7 @@ export default function ExpensePage() {
 
   const fetchBankAccounts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/bank-account", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/bank-account`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBankAccounts(res.data.accounts);
@@ -83,7 +83,7 @@ export default function ExpensePage() {
 
   const fetchExpenses = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/expense", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/expense`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setExpenses(res.data);
@@ -124,7 +124,7 @@ export default function ExpensePage() {
     try {
       const budget = parseFloat(budgetInput) || 0;
       await axios.put(
-        "http://localhost:5000/user/budget",
+        `${import.meta.env.VITE_API_URL}/user/budget`,
         { monthlyBudget: budget },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -159,7 +159,7 @@ export default function ExpensePage() {
       reader.onloadend = async () => {
         try {
           const res = await axios.post(
-            "http://localhost:5000/expense/scan-receipt",
+            `${import.meta.env.VITE_API_URL}/expense/scan-receipt`,
             { image: reader.result },
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -202,7 +202,7 @@ export default function ExpensePage() {
     const previousExpenses = [...expenses];
     try {
       const res = await axios.post(
-        "http://localhost:5000/expense/add",
+        `${import.meta.env.VITE_API_URL}/expense/add`,
         {
           amount: form.amount,
           description: form.description,

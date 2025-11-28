@@ -119,7 +119,7 @@ export default function ExpenseListPage() {
 
   const fetchExpenses = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/expense", {
+      const res = await axios.get("`${import.meta.env.VITE_API_URL}/expense", {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log('Fetched expenses:', res.data);
@@ -141,7 +141,7 @@ export default function ExpenseListPage() {
 
   const fetchBankAccounts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/bank-account", {
+      const res = await axios.get("`${import.meta.env.VITE_API_URL}/bank-account", {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log('Bank accounts:', res.data.accounts);

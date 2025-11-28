@@ -35,10 +35,10 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
     try {
       const token = localStorage.getItem("token");
       const [expenseRes, bankRes] = await Promise.all([
-        axios.get("http://localhost:5000/expense", {
+        axios.get("`${import.meta.env.VITE_API_URL}/expense", {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get("http://localhost:5000/bank-account", {
+        axios.get("`${import.meta.env.VITE_API_URL}/bank-account", {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -114,7 +114,7 @@ export default function ProfilePage({ userInfo, setUserInfo }) {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.put(
-        "http://localhost:5000/user/profile",
+        "`${import.meta.env.VITE_API_URL}/user/profile",
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

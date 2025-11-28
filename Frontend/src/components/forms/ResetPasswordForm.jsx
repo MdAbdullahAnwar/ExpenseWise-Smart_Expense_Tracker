@@ -8,7 +8,7 @@ import Toast from "../ui/toast";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function ResetPasswordForm() {
   const { id } = useParams();

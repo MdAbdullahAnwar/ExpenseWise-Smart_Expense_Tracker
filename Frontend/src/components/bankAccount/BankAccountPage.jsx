@@ -21,7 +21,7 @@ export default function BankAccountPage() {
 
   const fetchAccounts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/bank-account", {
+      const res = await axios.get("`${import.meta.env.VITE_API_URL}/bank-account", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAccounts(res.data.accounts);
@@ -46,7 +46,7 @@ export default function BankAccountPage() {
         );
         setToast({ message: "Account updated!", type: "success" });
       } else {
-        await axios.post("http://localhost:5000/bank-account", form, {
+        await axios.post("`${import.meta.env.VITE_API_URL}/bank-account", form, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setToast({ message: "Account added!", type: "success" });

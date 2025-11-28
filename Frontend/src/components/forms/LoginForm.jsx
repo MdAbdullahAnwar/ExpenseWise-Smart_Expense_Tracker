@@ -29,7 +29,7 @@ export default function LoginForm({ setUserId, setUserInfo }) {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/user/login", form, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/user/login`, form, {
         headers: { "Content-Type": "application/json" },
       });
 

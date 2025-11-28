@@ -29,7 +29,7 @@ export default function ExpenseTrends() {
   const fetchExpenses = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/expense", {
+      const res = await axios.get("`${import.meta.env.VITE_API_URL}/expense", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setExpenses(res.data);
