@@ -1,4 +1,17 @@
-require("dotenv").config();
+const fs = require('fs');
+const path = require('path');
+
+// Load .env.local if exists (for local dev), otherwise load .env (for production)
+const envLocalPath = path.resolve(__dirname, '.env.local');
+const envPath = path.resolve(__dirname, '.env');
+
+if (fs.existsSync(envLocalPath)) {
+  require("dotenv").config({ path: envLocalPath });
+  console.log('Loaded .env.local for local development');
+} else {
+  require("dotenv").config({ path: envPath });
+  console.log('Loaded .env for production');
+}
 const app = require("./app");
 const resetMonthlyBudgets = require('./scripts/resetMonthlyBudgets');
 const cron = require('node-cron');

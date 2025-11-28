@@ -457,34 +457,112 @@ expense-tracker/
 │   ├── migrations/         # Database migrations
 │   ├── scripts/            # Utility scripts
 │   ├── docs/               # Backend documentation
-│   ├── .env                # Environment variables
+│   ├── .env                # Production environment variables
+│   ├── .env.local          # Local development environment variables
 │   ├── server.js           # Entry point
 │   └── package.json
 │
 ├── Frontend/
 │   ├── src/
+│   │   ├── assets/        # Static assets
+│   │   │   └── react.svg
 │   │   ├── components/     # React components
-│   │   │   ├── analyse/   # Analytics components
-│   │   │   ├── expense/   # Expense management
-│   │   │   ├── forms/     # Auth forms
-│   │   │   ├── landing/   # Landing page
 │   │   │   ├── layout/    # Layout components
-│   │   │   ├── premium/   # Premium features
-│   │   │   ├── profile/   # User profile
+│   │   │   │   ├── Footer.jsx
+│   │   │   │   ├── Header.jsx
+│   │   │   │   └── Layout.jsx
+│   │   │   ├── pages/     # Page components
+│   │   │   │   ├── analyse/      # Analytics pages
+│   │   │   │   │   ├── AnalysePage.jsx
+│   │   │   │   │   ├── CategoryBreakdown.jsx
+│   │   │   │   │   ├── ExpenseTrends.jsx
+│   │   │   │   │   └── Leaderboard.jsx
+│   │   │   │   ├── bankAccount/  # Bank account management
+│   │   │   │   │   └── BankAccountPage.jsx
+│   │   │   │   ├── expense/      # Expense management pages
+│   │   │   │   │   ├── ExpenseDetailModal.jsx
+│   │   │   │   │   ├── ExpenseListPage.jsx
+│   │   │   │   │   └── ExpensePage.jsx
+│   │   │   │   ├── forms/        # Auth forms
+│   │   │   │   │   ├── ForgotPasswordForm.jsx
+│   │   │   │   │   ├── LoginForm.jsx
+│   │   │   │   │   ├── ResetPasswordForm.jsx
+│   │   │   │   │   └── SignupForm.jsx
+│   │   │   │   ├── landing/      # Landing page
+│   │   │   │   │   └── LandingPage.jsx
+│   │   │   │   ├── premium/      # Premium features pages
+│   │   │   │   │   ├── PremiumExpenseTracker.jsx
+│   │   │   │   │   ├── PremiumPage.jsx
+│   │   │   │   │   └── PremiumPurchase.jsx
+│   │   │   │   └── profile/      # User profile page
+│   │   │   │       └── ProfilePage.jsx
 │   │   │   └── ui/        # Reusable UI components
-│   │   ├── store/         # Redux store
-│   │   ├── hooks/         # Custom hooks
-│   │   ├── lib/           # Utilities
+│   │   │       ├── badge.jsx
+│   │   │       ├── button.jsx
+│   │   │       ├── card.jsx
+│   │   │       ├── input.jsx
+│   │   │       ├── label.jsx
+│   │   │       ├── Pagination.jsx
+│   │   │       └── toast.jsx
+│   │   ├── config/        # Configuration files
+│   │   │   └── config.js  # API URL configuration
+│   │   ├── constants/     # Constants
+│   │   │   ├── api/       # API constants
+│   │   │   │   └── auth.js
+│   │   │   └── message.js # Message constants
 │   │   ├── context/       # React contexts
+│   │   │   └── ThemeContext.jsx
+│   │   ├── hooks/         # Custom hooks
+│   │   │   └── usePagination.js
+│   │   ├── lib/           # Utilities
+│   │   │   └── utils.js
+│   │   ├── store/         # Redux store
+│   │   │   ├── store.js
+│   │   │   └── userSlice.js
+│   │   ├── utils/         # Utilities
+│   │   │   ├── api/       # Centralized API calls
+│   │   │   │   ├── auth/         # Auth API calls
+│   │   │   │   │   ├── forgotPassword.js
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   ├── login.js
+│   │   │   │   │   ├── register.js
+│   │   │   │   │   └── resetPassword.js
+│   │   │   │   ├── bankAccount/  # Bank account API calls
+│   │   │   │   │   ├── createAccount.js
+│   │   │   │   │   ├── deleteAccount.js
+│   │   │   │   │   ├── getAllAccounts.js
+│   │   │   │   │   └── index.js
+│   │   │   │   ├── expense/      # Expense API calls
+│   │   │   │   │   ├── createExpense.js
+│   │   │   │   │   ├── deleteExpense.js
+│   │   │   │   │   ├── getAllExpenses.js
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   └── updateExpense.js
+│   │   │   │   ├── premium/      # Premium API calls
+│   │   │   │   │   ├── downloadExpenses.js
+│   │   │   │   │   ├── getLeaderboard.js
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   ├── purchasePremium.js
+│   │   │   │   │   └── updateTransaction.js
+│   │   │   │   ├── profile/      # Profile API calls
+│   │   │   │   │   ├── getStats.js
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   └── updateBudget.js
+│   │   │   │   └── index.js      # Main API export
+│   │   │   ├── api.js     # Request handler (axios wrapper)
+│   │   │   └── validateForm.js
+│   │   ├── App.css        # App styles
 │   │   ├── App.jsx        # Main app component
+│   │   ├── index.css      # Global styles
 │   │   └── main.jsx       # Entry point
 │   ├── docs/              # Frontend documentation
-│   ├── .env               # Environment variables
+│   ├── .env               # Production environment variables
+│   ├── .env.local         # Local development environment variables
 │   ├── vite.config.js     # Vite configuration
 │   └── package.json
 │
 ├── screenshots/           # Application screenshots
-└── README.md             # This file
+├── README.md             # This file
 └── LICENSE               # MIT License
 ```
 
