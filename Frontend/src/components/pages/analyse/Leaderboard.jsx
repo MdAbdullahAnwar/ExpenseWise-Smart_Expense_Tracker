@@ -29,7 +29,7 @@ export default function Leaderboard() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:5000/leaderboard?type=expense&timeRange=${timeRange}`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/leaderboard?type=expense&timeRange=${timeRange}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLeaderboard(res.data);
