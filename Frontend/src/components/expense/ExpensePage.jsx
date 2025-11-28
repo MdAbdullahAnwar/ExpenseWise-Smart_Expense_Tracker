@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { setMonthlyBudget } from "../../store/userSlice";
-import { Target, Edit2, Save, X } from "lucide-react";
+import { Target, Edit2, Save, X, Camera, Upload } from "lucide-react";
 import Toast from "../ui/toast";
 
 export default function ExpensePage() {
@@ -28,6 +28,7 @@ export default function ExpensePage() {
   const [bankAccounts, setBankAccounts] = useState([]);
   const [isEditingBudget, setIsEditingBudget] = useState(false);
   const [budgetInput, setBudgetInput] = useState(0);
+  const [isScanning, setIsScanning] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const monthlyBudget = useSelector((state) => state.user.monthlyBudget);
@@ -147,6 +148,43 @@ export default function ExpensePage() {
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleReceiptScan = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsScanning(true);
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const res = await axios.post(
+            "http://localhost:5000/expense/scan-receipt",
+            { image: reader.result },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          setForm(prev => ({
+            ...prev,
+            amount: res.data.amount || prev.amount,
+            description: res.data.description || prev.description,
+            category: res.data.category || prev.category,
+            expenseDate: res.data.date || prev.expenseDate,
+          }));
+          setToast({ message: "Receipt scanned successfully!", type: "success" });
+        } catch (err) {
+          console.error(err);
+          setToast({ message: err.response?.data?.message || "Failed to scan receipt", type: "error" });
+        } finally {
+          setIsScanning(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      setIsScanning(false);
+      setToast({ message: "Failed to read image", type: "error" });
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -318,6 +356,38 @@ export default function ExpensePage() {
           </CardHeader>
 
           <CardContent className="px-4 sm:px-6">
+            <div className="mb-4">
+              <Label className="flex items-center gap-2 mb-2">
+                <Camera className="w-4 h-4" />
+                Scan Receipt (Auto-fill)
+              </Label>
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleReceiptScan}
+                  className="hidden"
+                  id="receipt-upload"
+                  disabled={isScanning}
+                />
+                <label htmlFor="receipt-upload">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full cursor-pointer"
+                    disabled={isScanning}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById('receipt-upload').click();
+                    }}
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    {isScanning ? "Scanning..." : "Upload Receipt Image"}
+                  </Button>
+                </label>
+              </div>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div className="space-y-2">
                 <Label>Transaction Type</Label>

@@ -25,25 +25,33 @@ A full-stack expense tracking application built with React, Node.js, Express, an
 
 ### Core Features
 - 🔐 **User Authentication** - Secure signup/login with JWT tokens
-- 💳 **Expense Management** - Add, edit, delete, and view expenses
+- 💳 **Expense & Income Tracking** - Add, edit, delete expenses and income
+- 🏦 **Bank Account Management** - Multiple accounts with balance tracking
+- 🔄 **Recurring Transactions** - Auto-add monthly salary/expenses
 - 📊 **Budget Tracking** - Set monthly budgets with visual progress indicators
 - 🔍 **Search & Filter** - Find expenses by description, category, or amount
 - 📱 **Responsive Design** - Works seamlessly on desktop, tablet, and mobile
 - 🌓 **Dark/Light Theme** - Toggle between themes (Premium feature)
+- 🛡️ **Rate Limiting** - Arcjet protection against abuse
 
 ### Premium Features
-- ⭐ **Premium Membership** - Razorpay payment integration
-- 📈 **Advanced Analytics** - Detailed expense trends and insights
+- ⭐ **Premium Membership** - Razorpay payment integration (₹499)
+- 📈 **Advanced Analytics** - Daily, weekly, monthly expense trends
 - 📊 **Category Breakdown** - Visual pie charts of spending by category
 - 🏆 **Leaderboard** - Compare spending with other premium users
-- 📥 **CSV Export** - Download expense data for external analysis
+- 📥 **PDF Export** - Download detailed expense reports
+- 🤖 **AI Receipt Scanner** - Auto-fill expenses from receipt images
+- 📧 **Monthly Email Reports** - AI-powered financial insights via email
 
 ### Additional Features
 - 👤 **Profile Management** - Update personal info and upload profile photo
 - 🔄 **Real-time Updates** - Optimistic UI updates for instant feedback
-- 📧 **Password Reset** - Email-based password recovery
+- 📧 **Password Reset** - Email-based password recovery via Brevo
 - 💾 **Transaction Safety** - Database transactions ensure data consistency
 - 🔔 **Toast Notifications** - User-friendly feedback messages
+- 📅 **Date-based Tracking** - Track expenses by specific dates
+- 📝 **Notes & Comments** - Add notes to transactions
+- 🎯 **Budget Alerts** - Visual warnings when approaching budget limits
 
 ## 📸 Screenshots
 
@@ -118,7 +126,12 @@ A full-stack expense tracking application built with React, Node.js, Express, an
 - **JWT** - Authentication tokens
 - **Bcrypt** - Password hashing
 - **Razorpay** - Payment gateway
-- **Nodemailer** - Email service
+- **Brevo (Sendinblue)** - Email service
+- **Arcjet** - Rate limiting & security
+- **Node-cron** - Scheduled tasks
+- **Axios** - HTTP client for AI APIs
+- **OpenRouter** - AI model access (GPT-4o-mini, Llama 3.2)
+- **Zod** - Schema validation
 
 ## 🚀 Getting Started
 
@@ -128,7 +141,9 @@ A full-stack expense tracking application built with React, Node.js, Express, an
 - MySQL (v8 or higher)
 - npm or yarn
 - Razorpay account (for premium features)
-- Brevo account (for email service)
+- Brevo account (for email service - FREE tier available)
+- OpenRouter API key (for AI features - FREE tier available)
+- Arcjet API key (for rate limiting - FREE tier available)
 
 ## 📦 Installation
 
@@ -180,7 +195,16 @@ RAZORPAY_KEY_SECRET=your_razorpay_secret
 # Email Configuration (Brevo)
 BREVO_API_KEY=your_brevo_api_key
 BREVO_SENDER_EMAIL=your_email@example.com
-BREVO_SENDER_NAME=ExpenseWise
+
+# Frontend URL
+FRONTEND_URL=http://localhost:5173
+
+# Arcjet Configuration
+ARCJET_KEY=your_arcjet_api_key
+ARCJET_ENV=development
+
+# AI Configuration (OpenRouter)
+GEMINI_API_KEY=your_openrouter_api_key
 ```
 
 ### Frontend (.env)
@@ -211,6 +235,15 @@ This will create the following tables:
 - Expenses
 - Orders
 - ForgotPasswordRequests
+- BankAccounts
+
+### 3. Run Migration Script (Optional)
+
+```bash
+node scripts/migrateUserTotals.js
+```
+
+This populates user totals for existing data.
 
 ## ▶️ Running the Application
 
@@ -265,13 +298,26 @@ Login user
 Get all expenses (requires authentication)
 
 #### POST /expense/add
-Add new expense
+Add new expense or income
 ```json
 {
   "amount": 500,
   "description": "Groceries",
   "category": "Food",
-  "note": "Weekly shopping"
+  "note": "Weekly shopping",
+  "expenseDate": "2024-01-15",
+  "type": "expense",
+  "BankAccountId": 1,
+  "isRecurring": false,
+  "recurringDay": null
+}
+```
+
+#### POST /expense/scan-receipt
+Scan receipt image and extract data (AI-powered)
+```json
+{
+  "image": "data:image/jpeg;base64,..."
 }
 ```
 
@@ -310,7 +356,94 @@ Update monthly budget
 }
 ```
 
-For complete API documentation, see [Backend/docs/API_DOCUMENTATION.md](Backend/docs/API_DOCUMENTATION.md)
+### Bank Account Endpoints
+
+#### GET /bank-account
+Get all bank accounts
+
+#### POST /bank-account
+Create new bank account
+```json
+{
+  "name": "HDFC Savings",
+  "balance": 50000,
+  "isDefault": true
+}
+```
+
+#### PUT /bank-account/:id
+Update bank account
+
+#### DELETE /bank-account/:id
+Delete bank account
+
+### Password Reset Endpoints
+
+#### POST /password/forgot-password
+Request password reset
+```json
+{
+  "email": "john@example.com"
+}
+```
+
+#### POST /password/reset-password/:token
+Reset password with token
+```json
+{
+  "password": "newpassword123"
+}
+```
+
+## 🤖 AI Features
+
+### Receipt Scanner
+- **Upload receipt images** to auto-fill expense forms
+- **Extracts:** Amount, Description, Category, Date
+- **Powered by:** GPT-4o-mini via OpenRouter
+- **Location:** Available on `/expenses` page
+
+### Monthly Email Reports (Premium Only)
+- **Automatic:** Sent on 1st of every month at 9 AM IST
+- **Includes:**
+  - Monthly income summary
+  - Category-wise spending breakdown (₹ and %)
+  - AI-generated financial insights (3 actionable tips)
+- **Powered by:** Llama 3.2 via OpenRouter
+- **Delivered via:** Brevo email service
+
+For detailed AI setup instructions, see [GEMINI_SETUP.md](GEMINI_SETUP.md)
+
+## 🏦 Bank Account Features
+
+- **Multiple Accounts:** Track expenses across different bank accounts
+- **Balance Tracking:** Real-time balance updates with transactions
+- **Default Account:** Set a default account for quick expense entry
+- **Account Management:** Add, edit, delete bank accounts
+- **Transaction History:** View all transactions per account
+
+## 🔄 Recurring Transactions
+
+- **Monthly Salary:** Auto-credit salary on specified day
+- **Recurring Expenses:** Auto-add monthly bills (rent, subscriptions)
+- **Flexible Scheduling:** Set any day (1-28) of the month
+- **Automatic Processing:** Cron job runs daily to process due transactions
+
+## 🛡️ Security Features
+
+- **JWT Authentication:** Secure token-based auth
+- **Password Hashing:** Bcrypt with salt rounds
+- **Rate Limiting:** Arcjet protection (5 requests/10 seconds for expenses)
+- **Input Validation:** Zod schema validation
+- **SQL Injection Protection:** Sequelize ORM parameterized queries
+- **CORS Configuration:** Controlled cross-origin access
+
+## 📧 Email Features
+
+- **Password Reset:** Secure token-based password recovery
+- **Monthly Reports:** AI-powered financial insights (Premium)
+- **Transaction Notifications:** Optional email alerts
+- **Brevo Integration:** Reliable email delivery (300 emails/day free)
 
 ## 📁 Project Structure
 
@@ -322,7 +455,8 @@ expense-tracker/
 │   ├── services/           # Business logic
 │   ├── models/             # Sequelize models
 │   ├── routes/             # API routes
-│   ├── middlewares/        # Auth and validation
+│   ├── middlewares/        # Auth, validation, rate limiting
+│   ├── validators/         # Zod schemas
 │   ├── migrations/         # Database migrations
 │   ├── scripts/            # Utility scripts
 │   ├── docs/               # Backend documentation
@@ -353,7 +487,7 @@ expense-tracker/
 │   └── package.json
 │
 ├── screenshots/           # Application screenshots
-├── README.md             # This file
+└── README.md             # This file
 └── LICENSE               # MIT License
 ```
 

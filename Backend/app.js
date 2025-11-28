@@ -6,12 +6,14 @@ const recurringTransactionService = require("./services/recurringTransactionServ
 
 const User = require("./models/user");
 const Expense = require("./models/expense");
-const Order = require("./models/order");
-const ForgotPasswordRequest = require("./models/forgotPasswordRequest");
 const BankAccount = require("./models/bankAccount");
+const Order = require("./models/order");
 
 User.hasMany(Expense);
 Expense.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
+
+User.hasMany(Order);
+Order.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
 
 User.hasMany(BankAccount);
 BankAccount.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
@@ -25,6 +27,7 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const leaderboardRoutes = require("./routes/leaderboardRoutes");
 const passwordRoutes = require("./routes/passwordRoutes");
 const bankAccountRoutes = require("./routes/bankAccountRoutes");
+const reportRoutes = require("./routes/reportRoutes");
 
 const app = express();
 
@@ -38,6 +41,7 @@ app.use("/payment", paymentRoutes);
 app.use("/leaderboard", leaderboardRoutes);
 app.use("/password", passwordRoutes);
 app.use("/bank-account", bankAccountRoutes);
+app.use("/report", reportRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");

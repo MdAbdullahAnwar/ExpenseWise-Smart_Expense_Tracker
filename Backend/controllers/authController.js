@@ -18,8 +18,8 @@ exports.login = async (req, res) => {
     const result = await authService.login(email, password);
     res.status(200).json({ message: "Login successful", ...result });
   } catch (err) {
-    console.error(err);
     const status = err.message === "User not found" ? 404 : err.message === "Invalid password" ? 401 : 500;
+    if (status === 500) console.error(err);
     res.status(status).json({ message: err.message || "Server error" });
   }
 };

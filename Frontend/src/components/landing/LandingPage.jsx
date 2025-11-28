@@ -5,10 +5,7 @@ import axios from "axios";
 import { 
   ArrowRight, 
   BarChart3, 
-  PieChart, 
-  TrendingUp, 
-  Shield, 
-  Zap, 
+  PieChart,
   Users,
   CheckCircle,
   Star,
@@ -20,7 +17,13 @@ import {
   Clock,
   Globe,
   Award,
-  DollarSign
+  DollarSign,
+  Camera,
+  Wallet,
+  RefreshCw,
+  Mail,
+  Download,
+  Lock
 } from "lucide-react";
 
 const HeroBadge = () => (
@@ -328,40 +331,58 @@ export default function LandingPage() {
 
   const features = [
     {
-      icon: BarChart3,
-      title: "Real-time Analytics",
-      description: "Track your spending patterns with interactive charts and insights",
+      icon: Camera,
+      title: "AI Receipt Scanner",
+      description: "Upload receipt images and auto-fill expense details with AI-powered extraction",
       color: "from-blue-500 to-cyan-500"
+    },
+    {
+      icon: Wallet,
+      title: "Bank Account Management",
+      description: "Track multiple bank accounts with real-time balance updates and transaction history",
+      color: "from-purple-500 to-pink-500"
+    },
+    {
+      icon: RefreshCw,
+      title: "Recurring Transactions",
+      description: "Auto-add monthly salary and recurring expenses on scheduled dates",
+      color: "from-green-500 to-emerald-500"
+    },
+    {
+      icon: Target,
+      title: "Budget Tracking",
+      description: "Set monthly budgets with visual progress indicators and alerts when approaching limits",
+      color: "from-red-500 to-orange-500"
+    },
+    {
+      icon: BarChart3,
+      title: "Advanced Analytics",
+      description: "Daily, weekly, and monthly expense trends with interactive charts and insights",
+      color: "from-yellow-500 to-amber-500"
     },
     {
       icon: PieChart,
       title: "Category Breakdown",
-      description: "Visualize where your money goes with detailed category analysis",
-      color: "from-purple-500 to-pink-500"
-    },
-    {
-      icon: TrendingUp,
-      title: "Budget Planning",
-      description: "Set budgets and get alerts when you're close to limits",
-      color: "from-green-500 to-emerald-500"
-    },
-    {
-      icon: Shield,
-      title: "Secure & Private",
-      description: "Your data is encrypted and never shared with third parties",
-      color: "from-red-500 to-orange-500"
-    },
-    {
-      icon: Zap,
-      title: "Lightning Fast",
-      description: "Instant expense tracking with real-time synchronization",
-      color: "from-yellow-500 to-amber-500"
-    },
-    {
-      icon: Users,
-      title: "Multi-user Support",
-      description: "Share expenses with family or roommates effortlessly",
+      description: "Visualize spending patterns with detailed pie charts and category-wise analysis",
       color: "from-indigo-500 to-purple-500"
+    },
+    {
+      icon: Mail,
+      title: "Monthly AI Reports",
+      description: "Get personalized financial insights and recommendations via email (Premium)",
+      color: "from-pink-500 to-rose-500"
+    },
+    {
+      icon: Download,
+      title: "Export Reports",
+      description: "Download detailed expense reports in PDF format for record keeping (Premium)",
+      color: "from-teal-500 to-cyan-500"
+    },
+    {
+      icon: Lock,
+      title: "Secure & Private",
+      description: "Bank-level encryption, JWT authentication, and rate limiting for maximum security",
+      color: "from-slate-500 to-gray-600"
     }
   ];
 

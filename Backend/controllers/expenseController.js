@@ -1,4 +1,5 @@
 const expenseService = require("../services/expenseService");
+const geminiService = require("../services/geminiService");
 
 exports.addExpense = async (req, res) => {
   try {
@@ -41,5 +42,21 @@ exports.deleteExpense = async (req, res) => {
     console.error(err);
     const status = err.message === "Expense not found" ? 404 : err.message === "Not authorized" ? 403 : 500;
     res.status(status).json({ message: err.message || "Server error" });
+  }
+};
+
+exports.scanReceipt = async (req, res) => {
+  try {
+    const { image } = req.body;
+    if (!image) {
+      return res.status(400).json({ message: "Image is required" });
+    }
+
+    const imageBase64 = image.replace(/^data:image\/\w+;base64,/, "");
+    const receiptData = await geminiService.scanReceipt(imageBase64);
+    res.status(200).json(receiptData);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Failed to scan receipt" });
   }
 };
