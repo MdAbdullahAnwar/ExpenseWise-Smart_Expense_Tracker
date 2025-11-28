@@ -120,10 +120,10 @@ const DashboardPreview = () => {
   const fetchExpenses = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("`${import.meta.env.VITE_API_URL}/expense", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/expense`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setExpenses(res.data);
+      setExpenses(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
     } finally {

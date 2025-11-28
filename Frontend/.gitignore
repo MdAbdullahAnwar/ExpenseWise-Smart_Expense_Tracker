@@ -1,8 +1,7 @@
 # Dependencies
 node_modules/
 
-# Environment variables
-.env
+# Environment variables (keep .env for production, ignore .env.local for local dev)
 .env.local
 .env.production
 
