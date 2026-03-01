@@ -3,7 +3,7 @@ const env = import.meta.env.MODE || "production";
 export const local_url = "http://localhost";
 export const local_port = "5000";
 
-export const prod_url = "https://expensewise-smart-expense-tracker.onrender.com";
+export const prod_url = import.meta.env.VITE_API_URL || "https://expensewise-smart-expense-tracker.onrender.com";
 export const prod_port = "";
 
 export const version = 'api';
