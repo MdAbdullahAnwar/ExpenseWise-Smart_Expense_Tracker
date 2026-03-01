@@ -31,8 +31,20 @@ const reportRoutes = require("./routes/reportRoutes");
 
 const app = express();
 
+const allowedOrigins = [
+  'https://expense-wise-smart-expense-tracker.vercel.app',
+  'https://expense-wise-smart-expense-tracker.vercel.app/',
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'https://expense-wise-smart-expense-tracker.vercel.app',
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.some(allowed => allowed === origin || allowed === origin + '/')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
