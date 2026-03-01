@@ -1,8 +1,6 @@
 const { Sequelize } = require("sequelize");
 require("dotenv").config();
 
-const isPostgres = process.env.DATABASE_URL || process.env.DB_DIALECT === 'postgres';
-
 let sequelize;
 
 if (process.env.DATABASE_URL) {
@@ -18,7 +16,7 @@ if (process.env.DATABASE_URL) {
     }
   });
 } else {
-  // MySQL connection (Aiven, PlanetScale, etc.)
+  // MySQL connection (Local, Aiven, PlanetScale, etc.)
   sequelize = new Sequelize(
     process.env.DB_NAME, 
     process.env.DB_USER, 
